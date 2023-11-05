@@ -15,7 +15,7 @@ jobs:
       run: |
         echo "KUBECONFIG_B64=$(printf \"$KUBECONFIG_DATA\" | base64 -w 0)" >> $GITHUB_ENV
       env:
-        KUBECONFIG_DATA: ${{secrets.KUBECONIG}}
+        KUBECONFIG_DATA: ${{secrets.KUBECONFIG}}
 
     - uses: danielr1996/kubectl-action@1.0.0
       name: Create afn namespace
