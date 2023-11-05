@@ -11,9 +11,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Setup kubeconfig
+      run: 'printf "$KUBECONFIG_DATA" > kubeconfig.yaml'
+      env:
+        KUBECONFIG_DATA: ${{secrets.KUBECONIG}}
+
     - uses: actions-hub/kubectl@master
       env:
-        KUBE_CONFIG: ${{ secrets.KUBECONFIG }}
+        KUBE_CONFIG: kubeconfig.yaml
       with:
         args: create ns afn
 
