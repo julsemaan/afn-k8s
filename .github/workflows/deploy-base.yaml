@@ -16,9 +16,13 @@ jobs:
       env:
         KUBECONFIG_DATA: ${{secrets.KUBECONIG}}
 
+    - name: Compute image tag
+      run: |
+        echo "KUBECONFIG_B64=$(printf \"$KUBECONFIG_DATA\" | base64 -w 0)" >> $GITHUB_ENV
+
     - uses: actions-hub/kubectl@master
       env:
-        KUBE_CONFIG: kubeconfig.yaml
+        KUBE_CONFIG: ${{ env.KUBECONFIG_B64 }}
       with:
         args: create ns afn
 
