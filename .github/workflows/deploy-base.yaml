@@ -13,7 +13,8 @@ jobs:
 
     - name: Setup KUBECONFIG_B64
       run: |
-        echo "KUBECONFIG_B64=$(printf \"$KUBECONFIG_DATA\" | base64 -w 0)" >> $GITHUB_ENV
+        printf "$KUBECONFIG_DATA" > /tmp/KUBECONFIG_DATA
+        echo "KUBECONFIG_B64=$(cat /tmp/KUBECONFIG_DATA | base64 -w 0)" >> $GITHUB_ENV
       env:
         KUBECONFIG_DATA: ${{secrets.KUBECONFIG}}
 
