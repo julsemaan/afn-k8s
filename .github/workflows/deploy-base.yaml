@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: 'Deploy'
+    - name: 'Deploy cert-manager'
       uses: 'vimeda/helm@v1.7.0'
       with:
         release: 'cert-manager'
@@ -23,6 +23,18 @@ jobs:
         repo-alias: jetstack
         values: |
           installCRDs: true
+      env:
+        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+
+    - name: 'Deploy cert-manager-webhook-linode'
+      uses: 'vimeda/helm@v1.7.0'
+      with:
+        release: 'cert-manager-webhook-linode'
+        namespace: 'cert-manager'
+        chart: 'https://github.com/slicen/cert-manager-webhook-linode/releases/download/v0.2.0/cert-manager-webhook-linode-v0.2.0.tgz'
+        values: |
+          deployment:
+            logLevel: null
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
 
