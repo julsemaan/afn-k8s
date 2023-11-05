@@ -16,7 +16,7 @@ jobs:
       with:
         release: 'cert-manager'
         namespace: 'cert-manager'
-        chart: 'cert-manager'
+        chart: 'jetstack/cert-manager'
         chart-version: v1.13.1
         token: '${{ github.token }}'
         repo: 'https://charts.jetstack.io'
