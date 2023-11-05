@@ -19,8 +19,8 @@ jobs:
         chart: 'charts/afn'
         token: '${{ github.token }}'
         value-files: >-
-        [
-          "afn-values.yaml"
-        ]
+          [
+            "afn-values.yaml"
+          ]
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
