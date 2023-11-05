@@ -11,19 +11,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup kubeconfig
-      run: 'printf "$KUBECONFIG_DATA" > kubeconfig.yaml'
+    - name: Setup KUBECONFIG_B64
+      run: |
+        echo "KUBECONFIG_B64=$(printf \"$KUBECONFIG_DATA\" | base64 -w 0)" >> $GITHUB_ENV
       env:
         KUBECONFIG_DATA: ${{secrets.KUBECONIG}}
 
-    - name: Compute image tag
-      run: |
-        echo "KUBECONFIG_B64=$(printf \"$KUBECONFIG_DATA\" | base64 -w 0)" >> $GITHUB_ENV
-
-    - uses: actions-hub/kubectl@master
-      env:
-        KUBE_CONFIG: ${{ env.KUBECONFIG_B64 }}
+    - uses: danielr1996/kubectl-action@1.0.0
+      name: Create afn namespace
       with:
+        kubeconfig: ${{ env.KUBECONFIG_B64 }}
         args: create ns afn
 
     - name: 'Deploy nodelocaldns'
