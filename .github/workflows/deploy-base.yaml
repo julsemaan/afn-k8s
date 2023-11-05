@@ -11,13 +11,23 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: 'Deploy nodelocaldns'
+      uses: 'vimeda/helm@v1.7.0'
+      with:
+        release: 'nodelocaldns'
+        chart: 'charts/nodelocaldns'
+        value-files: >-
+          [
+            "afn-values.yaml"
+          ]
+      env:
+        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
     - name: 'Deploy external-dns'
       uses: 'vimeda/helm@v1.7.0'
       with:
         release: 'external-dns'
         namespace: 'afn'
         chart: 'oci://registry-1.docker.io/bitnamicharts/external-dns'
-        token: '${{ github.token }}'
         value-files: >-
           [
             "external-dns-values.yaml"
@@ -32,7 +42,6 @@ jobs:
         namespace: 'cert-manager'
         chart: 'jetstack/cert-manager'
         chart-version: v1.13.1
-        token: '${{ github.token }}'
         repo: 'https://charts.jetstack.io'
         repo-alias: jetstack
         values: |

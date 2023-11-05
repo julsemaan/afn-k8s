@@ -1,3 +1,32 @@
+## Server
+
+sudo wget -qO /root/nm-quick.sh https://raw.githubusercontent.com/gravitl/netmaker/master/scripts/nm-quick.sh && sudo chmod +x /root/nm-quick.sh && sudo /root/nm-quick.sh
+
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --node-ip 10.101.0.1 --node-external-ip 1.2.3.4 --flannel-iface netmaker --disable=traefik" sh -
+
+cat /var/lib/rancher/k3s/server/token
+
+kubectl -n kube-system delete helmcharts.helm.cattle.io traefik
+
+### DNS local cache
+https://kubernetes.io/docs/tasks/administer-cluster/nodelocaldns/
+https://www.alibabacloud.com/help/en/ack/ack-managed-and-ack-dedicated/user-guide/configure-nodelocal-dnscache
+
+Set TTL to 30 seconds in coredns configmap: https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/
+
+## Client
+
+curl -sL 'https://apt.netmaker.org/gpg.key' | sudo tee /etc/apt/trusted.gpg.d/netclient.asc
+curl -sL 'https://apt.netmaker.org/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/netclient.list
+sudo apt update
+sudo apt install netclient
+
+export NETMAKER_TOKEN=XYZ
+netclient join -t $NETMAKER_TOKEN
+
+export TOKEN=XYZ
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://10.101.0.1:6443 --token $TOKEN --node-ip 10.101.0.2 --node-external-ip 1.2.3.4 --flannel-iface netmaker" sh -
+
 ## STUFF
 
 kubectl debug -it ubuntu --image=dockersec/tcpdump --target ubuntu -- sh
@@ -8,8 +37,8 @@ sudo ufw disable
 
 k create namespace afn
 k create namespace cert-manager
-mkdir -p secret/
 export LINODE_TOKEN=XYZ
+mkdir -p secret/
 cat > secret/linode-token.yaml << EOF
 ---
 apiVersion: v1
