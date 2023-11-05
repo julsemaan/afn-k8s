@@ -11,6 +11,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - uses: actions-hub/kubectl@master
+      env:
+        KUBE_CONFIG: ${{ secrets.KUBECONFIG }}
+      with:
+        args: create ns afn
+
     - name: 'Deploy nodelocaldns'
       uses: 'vimeda/helm@v1.7.0'
       with:
