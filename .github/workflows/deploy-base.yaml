@@ -15,6 +15,7 @@ jobs:
       uses: 'vimeda/helm@v1.7.0'
       with:
         release: 'nodelocaldns'
+        namespace: 'kube-system'
         chart: 'charts/nodelocaldns'
         value-files: >-
           [
