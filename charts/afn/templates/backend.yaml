@@ -1,0 +1,133 @@
+{{ $context := . }}
+{{ $afnSecret := (lookup "v1" "Secret" $context.Release.Namespace "afn-secret") }}
+{{ range .Values.regions }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-{{ include "afn.fullname" $context }}-{{ .name }}
+  namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.labels" $context | nindent 4 }}
+    app.region: backend-{{ include "afn.fullname" $context }}-{{ .name }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "afn.selectorLabels" $context | nindent 6 }}
+  template:
+    metadata:
+      {{- with $context.Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "afn.selectorLabels" $context | nindent 8 }}
+        app: backend
+        app.region: backend-{{ include "afn.fullname" $context }}-{{ .name }}
+    spec:
+      {{- with $context.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "afn.serviceAccountName" $context }}
+      securityContext:
+        {{- toYaml $context.Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: persistent
+          hostPath:
+            path: /var/lib/kvolumes/afn-backend
+            type: DirectoryOrCreate
+        - name: prod-app
+          emptyDir: {}
+        - name: dev-app
+          emptyDir: {}
+      initContainers:
+        - name: setup-prod-app
+          image: "{{ $context.Values.backend.appProdImage.repository }}:{{ $context.Values.backend.appProdImage.tag | default $context.Chart.AppVersion }}"
+          imagePullPolicy: {{ $context.Values.backend.appProdImage.pullPolicy }}
+          command: [ sh ]
+          args:
+            - -c
+            - |
+              cp -a /src/client/output/* /prod-app/
+          volumeMounts:
+            - name: prod-app
+              mountPath: /prod-app
+        - name: setup-dev-app
+          image: "{{ $context.Values.backend.appDevImage.repository }}:{{ $context.Values.backend.appDevImage.tag | default $context.Chart.AppVersion }}"
+          imagePullPolicy: {{ $context.Values.backend.appDevImage.pullPolicy }}
+          command: [ sh ]
+          args:
+            - -c
+            - |
+              cp -a /src/client/output/* /dev-app/
+          volumeMounts:
+            - name: dev-app
+              mountPath: /dev-app
+      containers:
+        - name: {{ $context.Chart.Name }}
+          securityContext:
+            {{- toYaml $context.Values.securityContext | nindent 12 }}
+          image: "{{ $context.Values.backend.image.repository }}:{{ $context.Values.backend.image.tag | default $context.Chart.AppVersion }}"
+          imagePullPolicy: {{ $context.Values.backend.image.pullPolicy }}
+          ports:
+            - name: listen-port
+              containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: listen-port
+          readinessProbe:
+            httpGet:
+              path: /
+              port: listen-port
+          resources:
+            {{- toYaml $context.Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: prod-app
+              mountPath: /prod-app
+            - name: prod-app
+              mountPath: /dev-app
+            - name: persistent
+              mountPath: /var/persistent
+          env:
+            - name: AFN_PROD_APP_PATH
+              value: /prod-app
+            - name: AFN_DEV_APP_PATH
+              value: /dev-app
+            - name: AFN_WEBSERVER_PEERS
+              {{- $last := sub (len $context.Values.regions) 1 }}
+              value: {{ range $index, $region := $context.Values.regions }}https://{{ $region.name }}.{{ $context.Values.geoDomain }}{{ if ne $index $last }},{{ end }}{{ end }}
+          {{ range $k, $v := $afnSecret.data }}
+            - name: {{ $k }}
+              valueFrom:
+                secretKeyRef:
+                  name: afn-secret
+                  key: {{ $k }}
+          {{- end }}
+      {{- with .nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $context.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $context.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-{{ include "afn.fullname" $context }}-{{ .name }}
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  selector:
+    app.region: backend-{{ include "afn.fullname" $context }}-{{ .name }}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+{{ end }}

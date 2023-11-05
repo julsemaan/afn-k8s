@@ -1,0 +1,101 @@
+{{ $context := . }}
+{{ $afnSecret := (lookup "v1" "Secret" $context.Release.Namespace "afn-secret") }}
+{{ range .Values.regions }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "afn.fullname" $context }}-caddyfile-{{ .name }}-{{ $context.Release.Revision }}
+  namespace: {{ $context.Release.Namespace }}
+data:
+  caddyfile: |
+    :80 {
+      respond /healthz 200
+    }
+
+    (no_events_access) {
+      handle /events {
+        respond "Unsupported path" 400
+      }
+    }
+
+    (afn_common) {
+      log
+
+      header * {
+        X-AFN-Server {system.hostname}
+        X-AFN-Frontend-Version 3
+        Access-Control-Allow-Origin  *
+      }
+    }
+
+    (backend_proxy) {
+      # Using svc.cluster.local to hit the 30 second TTL set in CoreDNS
+      reverse_proxy backend-{{ include "afn.fullname" $context }}-{{ .name }}.{{ $context.Release.Namespace }}.svc.cluster.local:80 {
+        transport http {
+          resolvers 169.254.20.10
+        }
+      }
+    }
+
+    (afn_webserver) {
+      import afn_common
+      import no_events_access
+      import backend_proxy
+    }
+
+    {{ $context.Values.lb.app.domain }} {
+      tls /etc/caddy/app-crt/tls.crt /etc/caddy/app-crt/tls.key
+
+      import afn_webserver
+    }
+    
+    {{ $context.Values.lb.realtime.domain }} {
+      tls /etc/caddy/realtime-crt/tls.crt /etc/caddy/realtime-crt/tls.key
+
+      import afn_webserver
+    }
+    
+    lb.{{ $context.Values.geoDomain }} {
+      tls /etc/caddy/lb-crt/tls.crt /etc/caddy/lb-crt/tls.key
+
+      import afn_webserver
+    }
+    
+    {{ $context.Values.lb.pages.domain }} {
+      tls /etc/caddy/pages-crt/tls.crt /etc/caddy/pages-crt/tls.key
+
+      import afn_common
+      
+      root * /pages
+      file_server
+    }
+    
+    {{ $context.Values.lb.admin.domain }} {
+      tls /etc/caddy/admin-crt/tls.crt /etc/caddy/admin-crt/tls.key
+
+      import afn_common
+      
+      root * /admin
+      file_server
+    }
+    
+    {{ .name }}.{{ $context.Values.geoDomain }} {
+      tls /etc/caddy/{{ .name }}-crt/tls.crt /etc/caddy/{{ .name }}-crt/tls.key
+
+      import afn_common
+
+      handle /events {
+        basicauth {
+          {{ $clusterObserverUsername := b64dec $afnSecret.data.CLUSTER_OBSERVER_USERNAME }}
+          {{ $clusterObserverPassword := b64dec $afnSecret.data.CLUSTER_OBSERVER_PASSWORD }}
+          {{ $clusterObserverUsername }} {{ htpasswd $clusterObserverUsername $clusterObserverPassword | replace (printf "%s:" $clusterObserverUsername) "" | b64enc }}
+        }
+        import backend_proxy
+      }
+
+      handle {
+        respond "Unsupported path" 400
+      }
+    }
+{{ end }}

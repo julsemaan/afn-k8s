@@ -1,0 +1,288 @@
+{{ $context := . }}
+{{ range .Values.regions }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+  namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.labels" $context | nindent 4 }}
+    app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "afn.selectorLabels" $context | nindent 6 }}
+      app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+  template:
+    metadata:
+      {{- with $context.Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "afn.selectorLabels" $context | nindent 8 }}
+        app: lb
+        app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+    spec:
+      dnsConfig:
+        nameservers:
+        - 169.254.20.10
+        options:
+        - name: ndots
+          value: "3"
+        - name: attempts
+          value: "2"
+        - name: timeout
+          value: "1"
+      {{- with $context.Values.lb.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "afn.serviceAccountName" $context }}
+      securityContext:
+        {{- toYaml $context.Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: setup-pages
+          image: "{{ $context.Values.lb.pages.image.repository }}:{{ $context.Values.lb.pages.image.tag | default $context.Chart.AppVersion }}"
+          imagePullPolicy: {{ $context.Values.lb.pages.image.pullPolicy }}
+          command: [ sh ]
+          args:
+            - -c
+            - |
+              cp -a /src/pages/* /pages/
+          volumeMounts:
+            - name: pages
+              mountPath: /pages
+        - name: setup-admin
+          image: "{{ $context.Values.lb.admin.image.repository }}:{{ $context.Values.lb.admin.image.tag | default $context.Chart.AppVersion }}"
+          imagePullPolicy: {{ $context.Values.lb.admin.image.pullPolicy }}
+          command: [ sh ]
+          args:
+            - -c
+            - |
+              cp -a /src/admin/* /admin/
+          volumeMounts:
+            - name: admin
+              mountPath: /admin
+      containers:
+        - name: {{ $context.Chart.Name }}
+          securityContext:
+            {{- toYaml $context.Values.securityContext | nindent 12 }}
+          image: "{{ $context.Values.lb.image.repository }}:{{ $context.Values.lb.image.tag | default $context.Chart.AppVersion }}"
+          imagePullPolicy: {{ $context.Values.lb.image.pullPolicy }}
+          ports:
+            - name: http-port
+              containerPort: 80
+              hostPort: 80
+            - name: https-port
+              containerPort: 443
+              hostPort: 443
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http-port
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http-port
+          volumeMounts:
+            - name: caddyfile-config-volume
+              mountPath: /etc/caddy/Caddyfile 
+              subPath: caddyfile
+            - name: lb-crt
+              mountPath: /etc/caddy/lb-crt
+              readOnly: true
+            - name: {{ .name }}-crt
+              mountPath: /etc/caddy/{{ .name }}-crt
+              readOnly: true
+            - name: app-crt
+              mountPath: /etc/caddy/app-crt
+              readOnly: true
+            - name: realtime-crt
+              mountPath: /etc/caddy/realtime-crt
+              readOnly: true
+            - name: pages-crt
+              mountPath: /etc/caddy/pages-crt
+              readOnly: true
+            - name: admin-crt
+              mountPath: /etc/caddy/admin-crt
+              readOnly: true
+            - name: pages
+              mountPath: /pages
+            - name: admin
+              mountPath: /admin
+          resources:
+            {{- toYaml $context.Values.resources | nindent 12 }}
+      {{- with .nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $context.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $context.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: pages
+        emptyDir: {}
+      - name: admin
+        emptyDir: {}
+      - name: caddyfile-config-volume
+        configMap:
+          name: {{ include "afn.fullname" $context }}-caddyfile-{{ .name }}-{{ $context.Release.Revision }}
+      - name: lb-crt
+        secret:
+          secretName: lb-crt-secret
+      - name: app-crt
+        secret:
+          secretName: app-crt-secret-tmp
+      - name: realtime-crt
+        secret:
+          secretName: realtime-crt-secret-tmp
+      - name: pages-crt
+        secret:
+          secretName: pages-crt-secret-tmp
+      - name: admin-crt
+        secret:
+          secretName: admin-crt-secret-tmp
+      - name: {{ .name }}-crt
+        secret:
+          secretName: {{ .name }}-crt-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb-{{ .name }}
+  namespace: {{ $context.Release.Namespace }}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: {{ .name }}.{{ $context.Values.geoDomain }}
+    external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
+spec:
+  ports:
+  - port: 80
+    name: external
+  clusterIP: None
+  selector:
+    app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .name }}-crt
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  secretName: {{ .name }}-crt-secret
+  dnsNames:
+  - {{ .name }}.{{ $context.Values.geoDomain }}
+  issuerRef:
+    name: letsencrypt-production
+    # We can reference ClusterIssuers by changing the kind here.
+    # The default value is Issuer (i.e. a locally namespaced Issuer)
+    kind: ClusterIssuer
+    group: cert-manager.io
+{{ end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: lb.{{ $context.Values.geoDomain }}
+    external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
+spec:
+  ports:
+  - port: 80
+    name: external
+  clusterIP: None
+  selector:
+    app: lb
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: {{ include "afn.fullname" $context }}-app-cname
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  endpoints:
+  - dnsName: {{ $context.Values.lb.app.domain }}
+    recordType: CNAME
+    targets:
+    - c.{{ .Values.geoDomain }}
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: {{ include "afn.fullname" $context }}-realtime-cname
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  endpoints:
+  - dnsName: {{ $context.Values.lb.realtime.domain }}
+    recordType: CNAME
+    targets:
+    {{ if $context.Values.lb.realtime.region }}
+    - {{ $context.Values.lb.realtime.region }}.{{ .Values.geoDomain }}
+    {{ else }}
+    - {{ (index $context.Values.regions 0).name }}.{{ .Values.geoDomain }}
+    {{ end }}
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: {{ include "afn.fullname" $context }}-pages-cname
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  endpoints:
+  - dnsName: {{ $context.Values.lb.pages.domain }}
+    recordType: CNAME
+    targets:
+    - c.{{ .Values.geoDomain }}
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: {{ include "afn.fullname" $context }}-admin-cname
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  endpoints:
+  - dnsName: {{ $context.Values.lb.admin.domain }}
+    recordType: CNAME
+    targets:
+    - c.{{ .Values.geoDomain }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: lb-crt
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: lb-crt-secret
+  dnsNames:
+  - lb.{{ $context.Values.geoDomain }}
+  issuerRef:
+    name: letsencrypt-production
+    # We can reference ClusterIssuers by changing the kind here.
+    # The default value is Issuer (i.e. a locally namespaced Issuer)
+    kind: ClusterIssuer
+    group: cert-manager.io
+#---
+#apiVersion: cert-manager.io/v1
+#kind: Certificate
+#metadata:
+#  name: app-crt
+#  namespace: {{ .Release.Namespace }}
+#spec:
+#  secretName: lb-crt-secret
+#  dnsNames:
+#  - {{ $context.Values.lb.app.domain }}
+#  - {{ $context.Values.lb.realtime.domain }}
+#  issuerRef:
+#    name: letsencrypt-production
+#    # We can reference ClusterIssuers by changing the kind here.
+#    # The default value is Issuer (i.e. a locally namespaced Issuer)
+#    kind: ClusterIssuer
+#    group: cert-manager.io

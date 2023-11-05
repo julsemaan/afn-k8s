@@ -1,0 +1,186 @@
+{{ $context := . }}
+{{ range .Values.regions }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: geodns-{{ include "afn.fullname" $context }}-{{ .name }}
+  namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.labels" $context | nindent 4 }}
+    app.region: geodns-{{ include "afn.fullname" $context }}-{{ .name }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "afn.selectorLabels" $context | nindent 6 }}
+      app.region: geodns-{{ include "afn.fullname" $context }}-{{ .name }}
+  template:
+    metadata:
+      {{- with $context.Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "afn.selectorLabels" $context | nindent 8 }}
+        app: geodns
+        app.region: geodns-{{ include "afn.fullname" $context }}-{{ .name }}
+    spec:
+      hostNetwork: true
+      {{- with $context.Values.geodns.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "afn.serviceAccountName" $context }}
+      securityContext:
+        {{- toYaml $context.Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: geodns
+          securityContext:
+            {{- toYaml $context.Values.securityContext | nindent 12 }}
+          image: "{{ $context.Values.geodns.image.repository }}:{{ $context.Values.geodns.image.tag | default $context.Chart.AppVersion }}"
+          imagePullPolicy: {{ $context.Values.geodns.image.pullPolicy }}
+          resources:
+            {{- toYaml $context.Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: geodns-config-volume
+              mountPath: ./dns/
+      {{- with .nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $context.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $context.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: geodns-config-volume
+        configMap:
+          name: {{ include "afn.fullname" $context }}-geodns-{{ $context.Release.Revision }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "afn.fullname" $context }}-patch-geodns-{{ .name }}-{{ $context.Release.Revision }}
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ include "afn.fullname" $context }}-patch-geodns
+      containers:
+      - name: patch-geodns
+        image: bitnami/kubectl:1.28-debian-11
+        command:
+          - bash
+          - -c
+          - |
+            EXTERNAL_IP=$(kubectl get nodes {{ range $k, $v := .nodeSelector }}-l{{ $k }}={{ $v }}{{ end }} -o json | jq -r '[ .items[0].status.addresses[] | select( .type | contains("ExternalIP")) ][0].address')
+            [ -z "$EXTERNAL_IP" ] && ( echo "Unable to get external IP" ; exit 1 )
+            echo "Setting $EXTERNAL_IP for geodns in region {{ .name }}"
+            kubectl patch daemonset geodns-{{ include "afn.fullname" $context }}-{{ .name }} -p "{\"spec\": { \"template\": { \"spec\": { \"containers\": [ { \"name\": \"geodns\", \"args\": [ \"-interface\", \"$EXTERNAL_IP\" ] } ] } } } }"
+
+      restartPolicy: Never
+  backoffLimit: 4
+{{ end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geodns
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: geodns.{{ $context.Values.geoDomain }}
+    external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
+spec:
+  ports:
+  - port: 53
+    name: external
+  clusterIP: None
+  selector:
+    app: geodns
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "afn.fullname" . }}-patch-geodns
+  namespace: {{ .Release.Namespace }}
+  labels:
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "afn.fullname" . }}-patch-geodns
+rules:
+- apiGroups: ["apps"]
+  resources: ["daemonsets"]
+  verbs: ["get", "patch"]
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "afn.fullname" . }}-patch-geodns
+subjects:
+- kind: ServiceAccount
+  name: {{ include "afn.fullname" . }}-patch-geodns
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "afn.fullname" . }}-patch-geodns
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "afn.fullname" $context }}-geodns-{{ $context.Release.Revision }}
+  namespace: {{ $context.Release.Namespace }}
+data:
+  {{ .Values.geoDomain }}.json: |
+    {
+        "serial": 1,
+        "data": {
+            {{- $last := sub (len .Values.dnsRegions) 1 }}
+            {{ range $index, $region := .Values.dnsRegions }}
+            {{ if $region.default }}
+              "c": { "cname": [ ["{{ $region.target }}.{{ $context.Values.geoDomain }}.", 0] ] },
+            {{ end }}
+            "c.{{ $region.name }}": { "cname": [ ["{{ $region.target }}.{{ $context.Values.geoDomain }}.", 0] ] }{{ if ne $index $last }},{{ end }}
+            {{ end }}
+        }
+    }
+
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: {{ include "afn.fullname" $context }}-geodns-ns-record
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  endpoints:
+  - dnsName: c.{{ .Values.geoDomain }}
+    recordTTL: 3600
+    recordType: NS
+    targets:
+    - geodns.v3geo.semaan.ca
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: {{ include "afn.fullname" $context }}-geodns-ns-record
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  endpoints:
+  - dnsName: c.{{ .Values.geoDomain }}
+    recordTTL: 3600
+    recordType: NS
+    targets:
+    - geodns.{{ .Values.geoDomain }}

@@ -1,0 +1,108 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "afn.fullname" . }}-coredns-patches
+  namespace: {{ .Release.Namespace }}
+data:
+  deployment: |
+    spec:
+      template:
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: {{ .Values.controlRegion.nodeSelectorConfig.key }}
+                    operator: In
+                    values:
+                    - {{ .Values.controlRegion.nodeSelectorConfig.value }}
+  configmap: |
+    data:
+      Corefile: |
+        .:53 {
+            errors
+            health
+            ready
+            kubernetes cluster.local in-addr.arpa ip6.arpa {
+              pods insecure
+              ttl 60
+              fallthrough in-addr.arpa ip6.arpa
+            }
+            hosts /etc/coredns/NodeHosts {
+              ttl 60
+              reload 15s
+              fallthrough
+            }
+            prometheus :9153
+            forward . /etc/resolv.conf
+            cache 30
+            loop
+            reload
+            loadbalance
+            import /etc/coredns/custom/*.override
+        }
+        import /etc/coredns/custom/*.server
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "afn.fullname" . }}-patch-coredns
+  namespace: {{ .Release.Namespace }}
+  labels:
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "afn.fullname" . }}-patch-coredns
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "patch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "afn.fullname" . }}-patch-coredns
+subjects:
+- kind: ServiceAccount
+  name: {{ include "afn.fullname" . }}-patch-coredns
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "afn.fullname" . }}-patch-coredns
+  apiGroup: rbac.authorization.k8s.io
+
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "afn.fullname" . }}-patch-coredns-{{ .Release.Revision }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ include "afn.fullname" . }}-patch-coredns
+      containers:
+      - name: patch-coredns
+        image: bitnami/kubectl:1.28-debian-11
+        command:
+          - bash
+          - -c
+          - |
+            kubectl get cm {{ include "afn.fullname" . }}-coredns-patches -o json | jq -r .data.deployment > /tmp/patch
+            kubectl patch deployment coredns -n kube-system --patch-file /tmp/patch
+            
+            kubectl get cm {{ include "afn.fullname" . }}-coredns-patches -o json | jq -r .data.configmap > /tmp/patch
+            kubectl patch configmap coredns -n kube-system --patch-file /tmp/patch
+            kubectl rollout restart deployment coredns -n kube-system
+      restartPolicy: Never
+  backoffLimit: 4

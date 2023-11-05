@@ -1,0 +1,2 @@
+- Add PVC to backend webserver to store synced data
+- Add API with a PVC to the chart

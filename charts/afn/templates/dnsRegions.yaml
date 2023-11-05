@@ -1,0 +1,16 @@
+#{{ $context := . }}
+#{{ range .Values.dnsRegions }}
+#---
+#apiVersion: externaldns.k8s.io/v1alpha1
+#kind: DNSEndpoint
+#metadata:
+#  name: {{ include "afn.fullname" $context }}-dns-region-{{ .name }}
+#  namespace: {{ $context.Release.Namespace }}
+#spec:
+#  endpoints:
+#  - dnsName: {{ .name }}.{{ $context.Values.geoDomain }}
+#    recordTTL: 30
+#    recordType: CNAME
+#    targets:
+#    - {{ .target }}.{{ $context.Values.geoDomain }}
+#{{ end }}

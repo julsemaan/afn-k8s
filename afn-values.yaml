@@ -1,0 +1,45 @@
+
+geoDomain: v3geo.semaan.ca
+
+controlRegion:
+  name: control
+  nodeSelectorConfig:
+    key: kubernetes.io/hostname
+    value: afn-control
+
+regions:
+  - name: asia
+    nodeSelector:
+      kubernetes.io/hostname: afn-osa-1
+  - name: europe
+    nodeSelector:
+      kubernetes.io/hostname: afn-mil-1
+
+
+dnsRegions:
+  - name: north-america
+    target: europe
+    default: true
+  - name: south-america
+    target: europe
+  - name: africa
+    target: europe
+  - name: asia
+    target: asia
+  - name: oceania
+    trget: asia
+
+lb:
+  app:
+    domain: anyfile-notepad.semaan.ca
+  realtime: 
+    domain: realtime.anyfile-notepad.semaan.ca
+    region: europe
+  pages:
+    domain: pages.anyfile-notepad.semaan.ca
+  admin:
+    domain: admin.anyfile-notepad.semaan.ca
+
+geodns:
+  image:
+    pullPolicy: Always

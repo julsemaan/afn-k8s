@@ -1,0 +1,103 @@
+# Default values for afn.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+geoDomain: DOMAIN_NAME
+
+dnsRegions: []
+
+lb:
+  imagePullSecrets: []
+  image:
+    repository: caddy
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "2.7"
+  pages:
+    image:
+      repository: ghcr.io/julsemaan/anyfile-notepad/pages
+      tag: 0682472adf9f2ac6664c8e64ea3f16732aa5c9b9
+      pullPolicy: IfNotPresent
+    domain: pages.DOMAIN_NAME
+  admin:
+    image:
+      repository: ghcr.io/julsemaan/anyfile-notepad/admin
+      tag: 5ba658e97456c0516cbc4d50e81810e283eb262b
+      pullPolicy: IfNotPresent
+    domain: admin.DOMAIN_NAME
+  app:
+    domain: app.DOMAIN_NAME
+  realtime:
+    domain: realtime.DOMAIN_NAME
+    region: null
+
+backend:
+  imagePullSecrets: []
+  image:
+    repository: ghcr.io/julsemaan/anyfile-notepad/webserver
+    tag: 69c260a363a617a3593f23373631110d9d870ce8
+    pullPolicy: IfNotPresent
+  appProdImage:
+    repository: ghcr.io/julsemaan/anyfile-notepad/client-light
+    tag: 69c260a363a617a3593f23373631110d9d870ce8
+    pullPolicy: IfNotPresent
+  appDevImage:
+    repository: ghcr.io/julsemaan/anyfile-notepad/client-light
+    tag: 69c260a363a617a3593f23373631110d9d870ce8
+    pullPolicy: IfNotPresent
+
+geodns:
+  imagePullSecrets: []
+  image:
+    repository: julsemaan/geodns
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+
+controlRegion: {}
+
+regions: []
+
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
