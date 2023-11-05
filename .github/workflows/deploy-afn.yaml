@@ -1,0 +1,26 @@
+name: Deploy AFN helm chart
+
+on:
+  workflow_dispatch:
+    branches: ['**']
+
+
+jobs:
+  deployment:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: 'Deploy'
+      uses: 'vimeda/helm@v1.7.0'
+      with:
+        release: 'afn'
+        namespace: 'afn'
+        chart: 'charts/afn'
+        token: '${{ github.token }}'
+        value-files: >-
+          [
+            "afn-values.yaml"
+          ]
+      env:
+        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'

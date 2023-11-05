@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy AFN base dependencies
 
 on:
   workflow_dispatch:
@@ -14,13 +14,15 @@ jobs:
     - name: 'Deploy'
       uses: 'vimeda/helm@v1.7.0'
       with:
-        release: 'afn'
-        namespace: 'afn'
-        chart: 'charts/afn'
+        release: 'cert-manager'
+        namespace: 'cert-manager'
+        chart: 'cert-manager'
+        chart-version: v1.13.1
         token: '${{ github.token }}'
-        value-files: >-
-          [
-            "afn-values.yaml"
-          ]
+        repo: 'https://charts.jetstack.io'
+        repo-alias: jetstack
+        values: |
+          installCRDs: true
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+
