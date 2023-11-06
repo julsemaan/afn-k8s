@@ -5,7 +5,7 @@ controlRegion:
   name: control
   nodeSelectorConfig:
     key: kubernetes.io/hostname
-    value: afn-control
+    value: afn-control-gha
 
 regions:
   - name: us-central
