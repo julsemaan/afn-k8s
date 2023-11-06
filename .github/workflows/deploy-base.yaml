@@ -18,11 +18,10 @@ jobs:
       env:
         KUBECONFIG_DATA: ${{secrets.KUBECONFIG}}
 
-    - uses: danielr1996/kubectl-action@1.0.0
-      name: Create afn namespace
+    - uses: tale/kubectl-action@v1
       with:
-        kubeconfig: ${{ env.KUBECONFIG_B64 }}
-        args: create ns afn
+        base64-kube-config: ${{ env.KUBECONFIG_B64 }}
+    - run: kubectl create namespace afn --dry-run -o yaml | kubectl apply -f -
 
     - name: 'Deploy nodelocaldns'
       uses: 'vimeda/helm@v1.7.0'
