@@ -31,7 +31,7 @@ dnsRegions:
     target: north-america
     default: true
   - name: south-america
-    target: north-america
+    target: south-america
   - name: africa
     target: us-central
   - name: europe
