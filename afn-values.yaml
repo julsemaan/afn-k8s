@@ -33,13 +33,13 @@ dnsRegions:
   - name: south-america
     target: south-america
   - name: africa
-    target: us-central
+    target: europe
   - name: europe
-    target: us-central
+    target: europe
   - name: asia
-    target: us-central
+    target: asia
   - name: oceania
-    trget: us-central
+    trget: oceania
 
 lb:
   app:
