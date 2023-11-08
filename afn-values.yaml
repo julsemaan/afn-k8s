@@ -6,21 +6,35 @@ controlRegion:
   name: control
   nodeSelectorConfig:
     key: kubernetes.io/hostname
-    value: afn-control-gha
+    value: afn-control-v3
 
 regions:
-  - name: us-central
+  - name: north-america
     nodeSelector:
-      kubernetes.io/hostname: afn-worker-ord
+      kubernetes.io/hostname: afn-srv-v3-ord-1
+  - name: south-america
+    nodeSelector:
+      kubernetes.io/hostname: afn-srv-v3-gru-1
+  - name: asia
+    nodeSelector:
+      kubernetes.io/hostname: afn-srv-v3-maa-1
+  - name: europe
+    nodeSelector:
+      kubernetes.io/hostname: afn-srv-v3-mil-1
+  - name: oceania
+    nodeSelector:
+      kubernetes.io/hostname: afn-srv-v3-sgp-1
 
 
 dnsRegions:
   - name: north-america
-    target: us-central
+    target: north-america
     default: true
   - name: south-america
-    target: us-central
+    target: north-america
   - name: africa
+    target: us-central
+  - name: europe
     target: us-central
   - name: asia
     target: us-central
@@ -32,7 +46,7 @@ lb:
     domain: anyfile-notepad.semaan.ca
   realtime: 
     domain: realtime.anyfile-notepad.semaan.ca
-    region: us-central
+    region: north-america
   pages:
     domain: pages.anyfile-notepad.semaan.ca
   admin:
