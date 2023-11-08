@@ -9,6 +9,12 @@ metadata:
   namespace: {{ $context.Release.Namespace }}
 data:
   caddyfile: |
+    {
+        servers {
+            metrics
+        }
+    }
+
     :80 {
       respond /healthz 200
     }
