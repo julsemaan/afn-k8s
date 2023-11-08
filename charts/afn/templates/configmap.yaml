@@ -94,6 +94,24 @@ data:
         import backend_proxy
       }
 
+      handle /metrics {
+        basicauth {
+          {{ $clusterObserverUsername := b64dec $afnSecret.data.CLUSTER_OBSERVER_USERNAME }}
+          {{ $clusterObserverPassword := b64dec $afnSecret.data.CLUSTER_OBSERVER_PASSWORD }}
+          {{ $clusterObserverUsername }} {{ htpasswd $clusterObserverUsername $clusterObserverPassword | replace (printf "%s:" $clusterObserverUsername) "" | b64enc }}
+        }
+        metrics
+      }
+
+      handle /node-metrics {
+        basicauth {
+          {{ $clusterObserverUsername := b64dec $afnSecret.data.CLUSTER_OBSERVER_USERNAME }}
+          {{ $clusterObserverPassword := b64dec $afnSecret.data.CLUSTER_OBSERVER_PASSWORD }}
+          {{ $clusterObserverUsername }} {{ htpasswd $clusterObserverUsername $clusterObserverPassword | replace (printf "%s:" $clusterObserverUsername) "" | b64enc }}
+        }
+        reverse_proxy http://169.254.20.10:9100
+      }
+
       handle {
         respond "Unsupported path" 400
       }
