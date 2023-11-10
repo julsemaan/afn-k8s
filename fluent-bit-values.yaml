@@ -1,0 +1,33 @@
+config:
+  filters: |
+    [FILTER]
+        Name kubernetes
+        Match kube.*
+        Merge_Log On
+        Keep_Log Off
+        K8S-Logging.Parser On
+        K8S-Logging.Exclude On
+    [FILTER]
+        Name                nest
+        Match               *
+        Wildcard            pod_name
+        Operation lift
+        Nested_under kubernetes
+        Add_prefix   kubernetes_
+    [FILTER]
+        Name                modify
+        Match               *
+        Copy     kubernetes_pod_name host
+  outputs: |
+    [OUTPUT]
+        Name syslog
+        Match kube.*
+        Host 10.101.0.7
+        Port 514
+        Mode udp
+        syslog_format        rfc5424
+        syslog_maxsize       2048
+        syslog_hostname_key  host
+        syslog_procid_key    procid
+        syslog_msgid_key     msgid
+        syslog_message_key   log

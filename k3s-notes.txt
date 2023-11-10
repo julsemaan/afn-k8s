@@ -16,10 +16,10 @@ Set TTL to 30 seconds in coredns configmap: https://kubernetes.io/docs/tasks/adm
 
 ## Client
 
-curl -sL 'https://apt.netmaker.org/gpg.key' | sudo tee /etc/apt/trusted.gpg.d/netclient.asc
-curl -sL 'https://apt.netmaker.org/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/netclient.list
-sudo apt update
-sudo apt install netclient
+curl -sL 'https://apt.netmaker.org/gpg.key' | tee /etc/apt/trusted.gpg.d/netclient.asc
+curl -sL 'https://apt.netmaker.org/debian.deb.txt' | tee /etc/apt/sources.list.d/netclient.list
+apt update
+apt install netclient
 
 export NETMAKER_TOKEN=XYZ
 netclient join -t $NETMAKER_TOKEN

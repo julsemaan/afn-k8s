@@ -36,6 +36,24 @@ jobs:
           ]
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+    
+    - name: 'Deploy fluent-bit'
+      uses: 'vimeda/helm@v1.7.0'
+      with:
+        release: 'fluent-bit'
+        namespace: 'kube-system'
+        chart: 'fluent/fluent-bit'
+        chart-version: '0.39.1'
+        repo: 'https://fluent.github.io/helm-charts'
+        repo-alias: fluent
+        value-files: >-
+          [
+            "fluent-bit-values.yaml"
+          ]
+      env:
+        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+
+
     - name: 'Deploy external-dns'
       uses: 'vimeda/helm@v1.7.0'
       with:
