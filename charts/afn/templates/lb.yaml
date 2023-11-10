@@ -201,58 +201,58 @@ spec:
   clusterIP: None
   selector:
     app: lb
----
-apiVersion: externaldns.k8s.io/v1alpha1
-kind: DNSEndpoint
-metadata:
-  name: {{ include "afn.fullname" $context }}-app-cname
-  namespace: {{ $context.Release.Namespace }}
-spec:
-  endpoints:
-  - dnsName: {{ $context.Values.lb.app.domain }}
-    recordType: CNAME
-    targets:
-    - c.{{ .Values.geoDomain }}
----
-apiVersion: externaldns.k8s.io/v1alpha1
-kind: DNSEndpoint
-metadata:
-  name: {{ include "afn.fullname" $context }}-realtime-cname
-  namespace: {{ $context.Release.Namespace }}
-spec:
-  endpoints:
-  - dnsName: {{ $context.Values.lb.realtime.domain }}
-    recordType: CNAME
-    targets:
-    {{ if $context.Values.lb.realtime.region }}
-    - {{ $context.Values.lb.realtime.region }}.{{ .Values.geoDomain }}
-    {{ else }}
-    - {{ (index $context.Values.regions 0).name }}.{{ .Values.geoDomain }}
-    {{ end }}
----
-apiVersion: externaldns.k8s.io/v1alpha1
-kind: DNSEndpoint
-metadata:
-  name: {{ include "afn.fullname" $context }}-pages-cname
-  namespace: {{ $context.Release.Namespace }}
-spec:
-  endpoints:
-  - dnsName: {{ $context.Values.lb.pages.domain }}
-    recordType: CNAME
-    targets:
-    - c.{{ .Values.geoDomain }}
----
-apiVersion: externaldns.k8s.io/v1alpha1
-kind: DNSEndpoint
-metadata:
-  name: {{ include "afn.fullname" $context }}-admin-cname
-  namespace: {{ $context.Release.Namespace }}
-spec:
-  endpoints:
-  - dnsName: {{ $context.Values.lb.admin.domain }}
-    recordType: CNAME
-    targets:
-    - c.{{ .Values.geoDomain }}
+#---
+#apiVersion: externaldns.k8s.io/v1alpha1
+#kind: DNSEndpoint
+#metadata:
+#  name: {{ include "afn.fullname" $context }}-app-cname
+#  namespace: {{ $context.Release.Namespace }}
+#spec:
+#  endpoints:
+#  - dnsName: {{ $context.Values.lb.app.domain }}
+#    recordType: CNAME
+#    targets:
+#    - c.{{ .Values.geoDomain }}
+#---
+#apiVersion: externaldns.k8s.io/v1alpha1
+#kind: DNSEndpoint
+#metadata:
+#  name: {{ include "afn.fullname" $context }}-realtime-cname
+#  namespace: {{ $context.Release.Namespace }}
+#spec:
+#  endpoints:
+#  - dnsName: {{ $context.Values.lb.realtime.domain }}
+#    recordType: CNAME
+#    targets:
+#    {{ if $context.Values.lb.realtime.region }}
+#    - {{ $context.Values.lb.realtime.region }}.{{ .Values.geoDomain }}
+#    {{ else }}
+#    - {{ (index $context.Values.regions 0).name }}.{{ .Values.geoDomain }}
+#    {{ end }}
+#---
+#apiVersion: externaldns.k8s.io/v1alpha1
+#kind: DNSEndpoint
+#metadata:
+#  name: {{ include "afn.fullname" $context }}-pages-cname
+#  namespace: {{ $context.Release.Namespace }}
+#spec:
+#  endpoints:
+#  - dnsName: {{ $context.Values.lb.pages.domain }}
+#    recordType: CNAME
+#    targets:
+#    - c.{{ .Values.geoDomain }}
+#---
+#apiVersion: externaldns.k8s.io/v1alpha1
+#kind: DNSEndpoint
+#metadata:
+#  name: {{ include "afn.fullname" $context }}-admin-cname
+#  namespace: {{ $context.Release.Namespace }}
+#spec:
+#  endpoints:
+#  - dnsName: {{ $context.Values.lb.admin.domain }}
+#    recordType: CNAME
+#    targets:
+#    - c.{{ .Values.geoDomain }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
