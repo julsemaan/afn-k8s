@@ -91,6 +91,11 @@ data:
 
       import afn_common
 
+      handle /healthz {
+        rewrite /healthz /
+        import backend_proxy
+      }
+
       handle /events {
         basicauth {
           {{ $clusterObserverUsername := b64dec $afnSecret.data.CLUSTER_OBSERVER_USERNAME }}
