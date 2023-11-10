@@ -158,16 +158,16 @@ data:
         }
     }
 
-#---
-#apiVersion: externaldns.k8s.io/v1alpha1
-#kind: DNSEndpoint
-#metadata:
-#  name: {{ include "afn.fullname" $context }}-geodns-ns-record
-#  namespace: {{ $context.Release.Namespace }}
-#spec:
-#  endpoints:
-#  - dnsName: c.{{ .Values.geoDomain }}
-#    recordTTL: 3600
-#    recordType: NS
-#    targets:
-#    - geodns.{{ .Values.geoDomain }}
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: {{ include "afn.fullname" $context }}-geodns-ns-record
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  endpoints:
+  - dnsName: c.{{ .Values.geoDomain }}
+    recordTTL: 3600
+    recordType: NS
+    targets:
+    - geodns.{{ .Values.geoDomain }}
