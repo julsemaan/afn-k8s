@@ -1,0 +1,6 @@
+- name: Do stuff on control-plane
+  hosts: controlPlane
+  tasks:
+  - name: set hostname
+    command: hostnamectl set-hostname {{inventory_hostname}}
+

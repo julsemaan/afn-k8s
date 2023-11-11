@@ -1,0 +1,7 @@
+- name: Do stuff on worker nodes
+  hosts: workerNode
+  tasks:
+  - name: set hostname
+    command: hostnamectl set-hostname {{inventory_hostname}}
+
+
