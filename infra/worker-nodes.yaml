@@ -4,4 +4,20 @@
   - name: set hostname
     command: hostnamectl set-hostname {{inventory_hostname}}
 
+  - name: Install netclient apt key
+    shell: "curl -sL 'https://apt.netmaker.org/gpg.key' | tee /etc/apt/trusted.gpg.d/netclient.asc"
+
+  - name: Install netclient apt repo
+    shell: "curl -sL 'https://apt.netmaker.org/debian.deb.txt' | tee /etc/apt/sources.list.d/netclient.list"
+
+  - name: apt update
+    command: apt update
+
+  - name: install the latest version of postfix
+    package:
+      name: netclient
+      state: latest
+
+  - name: Netclient join
+    command: "netclient join -t {{ netclient_token }}"
 
