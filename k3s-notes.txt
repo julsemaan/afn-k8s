@@ -77,3 +77,14 @@ helm install cert-manager-webhook-linode \
 
 helm upgrade afn charts/afn/ --install --namespace=afn --values afn-values.yaml
 
+## DNS replacement
+
+systemctl disable systemd-resolved.service
+systemctl mask systemd-resolved.service
+rm /etc/resolv.conf
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+## k3s service depend on netclient
+
+sed -i 's/network-online.target/network-online.target netclient.service/g' /etc/systemd/system/k3s-agent.service
+
