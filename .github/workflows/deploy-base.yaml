@@ -44,7 +44,7 @@ jobs:
     - run: kubectl create namespace afn --dry-run -o yaml | kubectl apply -f -
     - run: kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
     - run: |
-        kubectl apply -f secret/*.yaml
+        find secret/ -type f -exec kubectl apply -f {} \;
 
     - name: 'Deploy nodelocaldns'
       uses: 'vimeda/helm@v1.7.0'
