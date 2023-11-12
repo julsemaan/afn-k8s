@@ -26,6 +26,7 @@ jobs:
         requirements: infra/requirements.yaml
         # Optional, additional flags to pass to ansible-playbook
         options: |
+          -e netclient_token=${{secrets.NETCLIENT_TOKEN}}
           --inventory infra/inventory_linode.yaml
           --verbose
       env:
