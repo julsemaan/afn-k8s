@@ -46,4 +46,10 @@
     shell: |
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://{{hostvars[groups['controlPlane'][0]]["netmaker_ip"].stdout}}:6443 --token {{hostvars[groups['controlPlane'][0]]["join_token"].stdout}} --node-ip {{netmaker_ip.stdout}} --node-external-ip {{ipv4[0]}} --flannel-iface netmaker" sh -
 
+  - name: Add netmaker check ExecStartPre
+    shell: |
+      grep 'ExecStartPre=/usr/sbin/ip a show dev netmaker' /etc/systemd/system/k3s-agent.service || echo 'ExecStartPre=/usr/sbin/ip a show dev netmaker' >> /etc/systemd/system/k3s-agent.service
+
+  - name: Systemd reload
+    command: systemctl daemon-reload
 
