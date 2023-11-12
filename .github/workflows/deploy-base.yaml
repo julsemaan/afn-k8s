@@ -23,31 +23,14 @@ jobs:
 
     - name: Setup linode secrets file
       run: |
-        cat > secret/linode-token.yaml << EOF
-        ---
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: linode-api-token
-          namespace: afn
-        stringData:
-          linode_api_token: ${{secrets.LINODE_ACCESS_TOKEN}}
-        ---
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          namespace: cert-manager
-          name: linode-credentials
-        stringData:
-          token: ${{secrets.LINODE_ACCESS_TOKEN}}
-        EOF
+        find templates-secrets/ -type f -exec bash -c 'cat {} | envsubst > secret/`basename "$1"`' -- {} \;
 
     - uses: tale/kubectl-action@v1
       with:
         base64-kube-config: ${{ env.KUBECONFIG_B64 }}
     - run: kubectl create namespace afn --dry-run -o yaml | kubectl apply -f -
     - run: kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
-    - run: kubectl apply -f secret/linode-token.yaml
+    - run: kubectl apply -f secret/linode-secret.yaml
 
     - name: 'Deploy nodelocaldns'
       uses: 'vimeda/helm@v1.7.0'
