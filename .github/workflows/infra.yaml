@@ -26,5 +26,6 @@ jobs:
         requirements: infra/requirements.yaml
         # Optional, additional flags to pass to ansible-playbook
         options: |
+          -e access_token=${{secrets.LINODE_ACCESS_TOKEN}}
           --inventory infra/inventory_linode.yaml
           --verbose
