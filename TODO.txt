@@ -1,5 +1,6 @@
 - Add API with a PVC to the chart
-- Add monitoring of logs and errors
 - Detect that coredns isn´t using a longer TTL and alert (or redo the job?) (or switch the job to a cron?)
 - Health check on doing a DNS lookup to test connectivity 
-- When node reboots and control plane is down, flannel fails to setup vxlan properly and node is hosed while k3s-agent is alive. Need to detect that and restart k3s-agent accordingly
+- Install linode api secrets via GHA
+- Run os.yaml playbook in GHA
+- Add monit checks for OS level
