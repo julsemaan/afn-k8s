@@ -24,7 +24,7 @@ config:
         Match kube.*
         Host 10.101.0.2
         Port 514
-        Mode udp
+        Mode tcp
         syslog_format        rfc5424
         syslog_maxsize       2048
         syslog_hostname_key  host
