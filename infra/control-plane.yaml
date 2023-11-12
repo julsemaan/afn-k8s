@@ -1,6 +1,14 @@
-- name: Do stuff on control-plane
+- name: Setup basic control plane
   hosts: controlPlane
   tasks:
-  - name: set hostname
-    command: hostnamectl set-hostname {{inventory_hostname}}
+  - name: Find netmaker IP
+    shell: |
+      set -o pipefail && ip a show dev netmaker | egrep -o 'inet [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | sed 's/inet //'
+    args:
+      executable: /usr/bin/bash
+    register: netmaker_ip
+
+  - name: Install k3s server
+    shell: |
+      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --node-ip {{ netmaker_ip.stdout }} --node-external-ip {{ ipv4[0] }} --flannel-iface netmaker --disable=traefik" sh -
 

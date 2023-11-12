@@ -1,9 +1,20 @@
+- name: Get join token
+  hosts: controlPlane
+  tasks:
+  - name: Get join token from control plane node
+    shell: |
+      cat /var/lib/rancher/k3s/server/token | tr -d '\n'
+    register: join_token
+  - name: Find netmaker IP
+    shell: |
+      set -o pipefail && ip a show dev netmaker | egrep -o 'inet [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | sed 's/inet //'
+    args:
+      executable: /usr/bin/bash
+    register: netmaker_ip
+
 - name: Join worker nodes to netmaker
   hosts: workerNode
   tasks:
-  - name: set hostname
-    command: hostnamectl set-hostname {{inventory_hostname}}
-
   - name: Install netclient apt key
     shell: "curl -sL 'https://apt.netmaker.org/gpg.key' | tee /etc/apt/trusted.gpg.d/netclient.asc"
 
@@ -20,4 +31,19 @@
 
   - name: Netclient join
     command: "netclient join -t {{ netclient_token }}"
+
+  - name: Find netmaker IP
+    retries: 20
+    delay: 5
+    shell: |
+      set -o pipefail && ip a show dev netmaker | egrep -o 'inet [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | sed 's/inet //'
+    args:
+      executable: /usr/bin/bash
+    register: netmaker_ip
+    until: netmaker_ip.rc == 0
+
+  - name: Install k3s agent
+    shell: |
+      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://{{hostvars[groups['controlPlane'][0]]["netmaker_ip"].stdout}}:6443 --token {{hostvars[groups['controlPlane'][0]]["join_token"].stdout}} --node-ip {{netmaker_ip.stdout}} --node-external-ip {{ipv4[0]}} --flannel-iface netmaker" sh -
+
 

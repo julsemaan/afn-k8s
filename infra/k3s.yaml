@@ -1,0 +1,11 @@
+- name: Basic setup
+  hosts: controlPlane:workerNode
+  tasks:
+  - name: Set hostname
+    command: hostnamectl set-hostname {{inventory_hostname}}
+
+- name: Setup control plane
+  import_playbook: control-plane.yaml
+
+- name: Setup worker nodes
+  import_playbook: worker-nodes.yaml
