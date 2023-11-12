@@ -17,7 +17,7 @@ regions:
       kubernetes.io/hostname: afn-v3-srv-gru-1
   - name: asia
     nodeSelector:
-      kubernetes.io/hostname: afn-v3-srvmaa-1
+      kubernetes.io/hostname: afn-v3-srv-maa-1
   - name: europe
     nodeSelector:
       kubernetes.io/hostname: afn-v3-srv-mil-1
