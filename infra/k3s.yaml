@@ -14,10 +14,6 @@
   - name: Configure /etc/resolv.conf
     shell: echo "nameserver 8.8.8.8" > /etc/resolv.conf
 
-
-- name: Setup OS on all nodes
-  import_playbook: os.yaml
-
 - name: Setup control plane
   import_playbook: control-plane.yaml
 
