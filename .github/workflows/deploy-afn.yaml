@@ -18,6 +18,7 @@ jobs:
         namespace: 'afn'
         chart: 'charts/afn'
         token: '${{ github.token }}'
+        timeout: 10m
         value-files: >-
           [
             "afn-values.yaml"
