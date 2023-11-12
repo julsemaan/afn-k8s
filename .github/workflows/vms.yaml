@@ -19,7 +19,7 @@ jobs:
       with:
         # Required, playbook filepath
         playbook: infra/linodes.yaml
-        vault_password: ${{secrets.VAULT_PASSWORD}}
+        vault_password: ${{secrets.VAULT_PASS}}
         requirements: infra/requirements.yaml
         # Optional, additional flags to pass to ansible-playbook
         options: |
