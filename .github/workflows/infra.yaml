@@ -1,0 +1,27 @@
+name: Deploy AFN infrastructure
+
+on:
+  workflow_dispatch:
+    branches: ['**']
+
+
+jobs:
+  deployment:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run playbook
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+        # Required, playbook filepath
+        playbook: infra/worker-nodes.yaml
+        # Optional, SSH private key
+        key: ${{secrets.SSH_PRIVATE_KEY}}
+        # Optional, encrypted vault password
+        vault_password: ${{secrets.VAULT_PASSWORD}}
+        requirements: infra/requirements.yaml
+        # Optional, additional flags to pass to ansible-playbook
+        options: |
+          --inventory infra/inventory_linode.yaml
+          --verbose
