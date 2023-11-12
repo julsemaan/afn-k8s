@@ -1,4 +1,4 @@
-- name: Do stuff on worker nodes
+- name: Join worker nodes to netmaker
   hosts: workerNode
   tasks:
   - name: set hostname
@@ -13,7 +13,7 @@
   - name: apt update
     command: apt update
 
-  - name: install the latest version of postfix
+  - name: install the latest version of netclient
     package:
       name: netclient
       state: latest
