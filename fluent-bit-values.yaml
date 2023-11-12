@@ -22,7 +22,7 @@ config:
     [OUTPUT]
         Name syslog
         Match kube.*
-        Host 10.101.0.7
+        Host 10.101.0.2
         Port 514
         Mode udp
         syslog_format        rfc5424
