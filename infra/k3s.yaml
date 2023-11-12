@@ -3,9 +3,24 @@
   tasks:
   - name: Set hostname
     command: hostnamectl set-hostname {{inventory_hostname}}
+  - name: Stop systemd-resolved
+    command: systemctl stop systemd-resolved.service
+  - name: Disable systemd-resolved
+    command: systemctl disable systemd-resolved.service
+  - name: Mask systemd-resolved
+    command: systemctl mask systemd-resolved.service
+  - name: Remove /etc/resolv.conf symlink
+    command: rm /etc/resolv.conf
+  - name: Configure /etc/resolv.conf
+    shell: echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+
+- name: Setup OS on all nodes
+  import_playbook: os.yaml
 
 - name: Setup control plane
   import_playbook: control-plane.yaml
 
 - name: Setup worker nodes
   import_playbook: worker-nodes.yaml
+
