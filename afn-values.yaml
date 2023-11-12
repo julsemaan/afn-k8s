@@ -11,19 +11,19 @@ controlRegion:
 regions:
   - name: north-america
     nodeSelector:
-      kubernetes.io/hostname: afn-srv-v3-ord-1
+      kubernetes.io/hostname: afn-v3-srv-ord-1
   - name: south-america
     nodeSelector:
-      kubernetes.io/hostname: afn-srv-v3-gru-1
+      kubernetes.io/hostname: afn-v3-srv-gru-1
   - name: asia
     nodeSelector:
-      kubernetes.io/hostname: afn-srv-v3-maa-1
+      kubernetes.io/hostname: afn-v3-srvmaa-1
   - name: europe
     nodeSelector:
-      kubernetes.io/hostname: afn-srv-v3-mil-1
+      kubernetes.io/hostname: afn-v3-srv-mil-1
   - name: oceania
     nodeSelector:
-      kubernetes.io/hostname: afn-srv-v3-sgp-1
+      kubernetes.io/hostname: afn-v3-srv-sgp-1
 
 
 dnsRegions:
