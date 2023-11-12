@@ -1,0 +1,9 @@
+- Deploy GHA VMs
+- Setup the DNS record for netmaker
+- Install netmaker on control linode
+  - sudo wget -qO /root/nm-quick.sh https://raw.githubusercontent.com/gravitl/netmaker/master/scripts/nm-quick.sh && sudo chmod +x /root/nm-quick.sh && sudo /root/nm-quick.sh
+- Get netmaker join token and configure it in the GHA secrets (NETCLIENT_TOKEN)
+- Run the K3S GHA
+- Extract the kubeconfig from /etc/rancher/k3s/k3s.yaml and configure it in the GHA secrets (KUBECONFIG)
+  - NOTE: k3s.yaml will point to 127.0.0.1, change for the public IP
+- Set the correct syslog IP in the fluentbit helm values
