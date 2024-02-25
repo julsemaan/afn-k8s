@@ -43,6 +43,7 @@ jobs:
         base64-kube-config: ${{ env.KUBECONFIG_B64 }}
     - run: kubectl create namespace afn --dry-run -o yaml | kubectl apply -f -
     - run: kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
+    - run: kubectl create namespace reloader --dry-run -o yaml | kubectl apply -f -
     - run: |
         find secret/ -type f -exec kubectl apply -f {} \;
 
