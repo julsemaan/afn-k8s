@@ -9,6 +9,8 @@ metadata:
   labels:
     {{- include "afn.labels" $context | nindent 4 }}
     app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+  annotations:
+    secret.reloader.stakater.com/reload: "lb-crt-secret,{{ .name }}-crt-secret"
 spec:
   selector:
     matchLabels:
