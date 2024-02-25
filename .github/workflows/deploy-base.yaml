@@ -121,7 +121,7 @@ jobs:
         release: 'reloader'
         namespace: 'reloader'
         chart: 'stakater/reloader'
-        chart-version: v1.13.1
+        chart-version: v1.0.69
         repo: 'https://stakater.github.io/stakater-charts'
         repo-alias: stakater
       env:
