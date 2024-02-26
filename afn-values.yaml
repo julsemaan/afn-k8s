@@ -11,7 +11,7 @@ controlRegion:
 regions:
   - name: north-america
     nodeSelector:
-      kubernetes.io/hostname: afn-v3-srv-ord-1
+      kubernetes.io/hostname: afn-v3-srv-ord-2
   - name: south-america
     nodeSelector:
       kubernetes.io/hostname: afn-v3-srv-gru-1
