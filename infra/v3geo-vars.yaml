@@ -32,6 +32,10 @@ linodes:
     region: us-ord
     instanceType: g6-nanode-1
     typeTag: workerNode
+  srv-ord-2:
+    region: us-ord
+    instanceType: g6-nanode-1
+    typeTag: workerNode
   srv-sgp-1:
     region: ap-south
     instanceType: g6-nanode-1
