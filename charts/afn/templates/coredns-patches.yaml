@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "afn.fullname" . }}-coredns-patches
-  namespace: {{ .Release.Namespace }}
+  namespace: kube-system
 data:
   deployment: |
     spec:
@@ -50,7 +50,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: {{ include "afn.fullname" . }}-patch-coredns
-  namespace: {{ .Release.Namespace }}
+  namespace: kube-system
   labels:
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
@@ -74,7 +74,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: {{ include "afn.fullname" . }}-patch-coredns
-  namespace: {{ .Release.Namespace }}
+  namespace: kube-system
 roleRef:
   kind: ClusterRole
   name: {{ include "afn.fullname" . }}-patch-coredns
@@ -82,13 +82,23 @@ roleRef:
 
 
 ---
-apiVersion: batch/v1
-kind: Job
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: {{ include "afn.fullname" . }}-patch-coredns-{{ .Release.Revision }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "afn.fullname" . }}-patch-coredns
+  namespace: kube-system
+  annotations:
+    configmap.reloader.stakater.com/reload: "coredns"
+  labels:
+    app: {{ include "afn.fullname" . }}-patch-coredns
 spec:
+  selector:
+    matchLabels:
+      app: {{ include "afn.fullname" . }}-patch-coredns
   template:
+    metadata:
+      labels:
+        app: {{ include "afn.fullname" . }}-patch-coredns
     spec:
       serviceAccountName: {{ include "afn.fullname" . }}-patch-coredns
       containers:
@@ -98,11 +108,12 @@ spec:
           - bash
           - -c
           - |
-            kubectl get cm {{ include "afn.fullname" . }}-coredns-patches -o json | jq -r .data.deployment > /tmp/patch
-            kubectl patch deployment coredns -n kube-system --patch-file /tmp/patch
-            
-            kubectl get cm {{ include "afn.fullname" . }}-coredns-patches -o json | jq -r .data.configmap > /tmp/patch
-            kubectl patch configmap coredns -n kube-system --patch-file /tmp/patch
-            kubectl rollout restart deployment coredns -n kube-system
-      restartPolicy: Never
-  backoffLimit: 4
+            while true; do
+              kubectl get cm {{ include "afn.fullname" . }}-coredns-patches -o json | jq -r .data.deployment > /tmp/patch
+              kubectl patch deployment coredns -n kube-system --patch-file /tmp/patch
+              
+              kubectl get cm {{ include "afn.fullname" . }}-coredns-patches -o json | jq -r .data.configmap > /tmp/patch
+              kubectl patch configmap coredns -n kube-system --patch-file /tmp/patch
+              kubectl rollout restart deployment coredns -n kube-system
+              sleep 3600
+            done
