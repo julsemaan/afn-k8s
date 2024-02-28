@@ -28,8 +28,6 @@ spec:
         app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
     spec:
       dnsConfig:
-        nameservers:
-        - 169.254.20.10
         options:
         - name: ndots
           value: "3"

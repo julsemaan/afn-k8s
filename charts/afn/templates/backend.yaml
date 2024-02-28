@@ -25,6 +25,14 @@ spec:
         app: backend
         app.region: backend-{{ include "afn.fullname" $context }}-{{ .name }}
     spec:
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "3"
+        - name: attempts
+          value: "2"
+        - name: timeout
+          value: "1"
       {{- with $context.Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
