@@ -39,7 +39,11 @@ data:
 
     (backend_proxy) {
       # Using svc.cluster.local to hit the 30 second TTL set in CoreDNS
-      reverse_proxy backend-{{ include "afn.fullname" $context }}-{{ .name }}.{{ $context.Release.Namespace }}.svc.cluster.local:80 
+      reverse_proxy backend-{{ include "afn.fullname" $context }}-{{ .name }}.{{ $context.Release.Namespace }}.svc.cluster.local:80 {
+        transport http {
+          resolvers 169.254.20.10
+        }
+      }
     }
 
     (afn_webserver) {
@@ -129,8 +133,11 @@ data:
           {{ $clusterObserverUsername }} {{ htpasswd $clusterObserverUsername $clusterObserverPassword | replace (printf "%s:" $clusterObserverUsername) "" | b64enc }}
         }
         rewrite /coredns-metrics /metrics
-        reverse_proxy http://kube-dns.kube-system.svc.cluster.local:9153
-        
+        reverse_proxy http://kube-dns.kube-system.svc.cluster.local:9153 {
+          transport http {
+            resolvers 169.254.20.10
+          }
+        }
       }
 
       handle {
