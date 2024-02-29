@@ -11,3 +11,6 @@ X Install linode api secrets via GHA
   - status of k3s-agent
   - flannel routes in place
   - ...
+
+- Have a monitoring job for node-local-dns that sends metrics to prometheus
+  watch bash -c "time dig kube-dns.kube-system.svc.cluster.local"'
