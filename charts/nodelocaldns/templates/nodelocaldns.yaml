@@ -66,6 +66,7 @@ data:
         bind {{ .Values.dnsLocalIp }} {{ .Values.kubeDnsSvcIp }}
         forward . __PILLAR__CLUSTER__DNS__ {
                 force_tcp
+                expire 10m
         }
         prometheus :9253
         health {{ .Values.dnsLocalIp }}:8080
@@ -82,6 +83,7 @@ data:
         bind {{ .Values.dnsLocalIp }} {{ .Values.kubeDnsSvcIp }}
         forward . __PILLAR__CLUSTER__DNS__ {
                 force_tcp
+                expire 10m
         }
         prometheus :9253
         }
@@ -97,6 +99,7 @@ data:
         bind {{ .Values.dnsLocalIp }} {{ .Values.kubeDnsSvcIp }}
         forward . __PILLAR__CLUSTER__DNS__ {
                 force_tcp
+                expire 10m
         }
         prometheus :9253
         }
