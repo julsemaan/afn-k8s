@@ -59,6 +59,7 @@ data:
         cache {
                 success 9984 300 30
                 denial 9984 300 30
+                prefetch 1 5m 25%
         }
         reload
         loop
