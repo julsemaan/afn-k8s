@@ -57,8 +57,8 @@ data:
     cluster.local:53 {
         errors
         cache {
-                success 9984 30
-                denial 9984 30
+                success 9984 300 30
+                denial 9984 300 30
         }
         reload
         loop
@@ -71,7 +71,10 @@ data:
         }
     in-addr.arpa:53 {
         errors
-        cache 30
+        cache {
+                success 9984 300 30
+                denial 9984 300 30
+        }
         reload
         loop
         bind {{ .Values.dnsLocalIp }} {{ .Values.kubeDnsSvcIp }}
@@ -82,7 +85,10 @@ data:
         }
     ip6.arpa:53 {
         errors
-        cache 30
+        cache {
+                success 9984 300 30
+                denial 9984 300 30
+        }
         reload
         loop
         bind {{ .Values.dnsLocalIp }} {{ .Values.kubeDnsSvcIp }}
@@ -93,7 +99,10 @@ data:
         }
     .:53 {
         errors
-        cache 30
+        cache {
+                success 9984 300 30
+                denial 9984 300 30
+        }
         reload
         loop
         bind {{ .Values.dnsLocalIp }} {{ .Values.kubeDnsSvcIp }}
