@@ -60,6 +60,7 @@ data:
                 success 9984 300 30
                 denial 9984 300 30
                 prefetch 1 60m 25%
+                serve_stale
         }
         reload
         loop
@@ -77,6 +78,7 @@ data:
                 success 9984 300 30
                 denial 9984 300 30
                 prefetch 1 60m 25%
+                serve_stale
         }
         reload
         loop
@@ -93,6 +95,7 @@ data:
                 success 9984 300 30
                 denial 9984 300 30
                 prefetch 1 60m 25%
+                serve_stale
         }
         reload
         loop
@@ -109,6 +112,7 @@ data:
                 success 9984 300 30
                 denial 9984 300 30
                 prefetch 1 60m 25%
+                serve_stale
         }
         reload
         loop
