@@ -30,6 +30,7 @@ spec:
         ports:
           - containerPort: 9100
             hostPort: 9100
+            hostIP: 169.254.20.10
             protocol: TCP
         resources:
           limits:
