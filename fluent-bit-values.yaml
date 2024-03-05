@@ -22,7 +22,7 @@ config:
     [OUTPUT]
         Name syslog
         Match kube.*
-        Host 10.101.0.2
+        Host afn-syslog.afn.svc.cluster.local
         Port 514
         Mode tcp
         syslog_format        rfc5424
