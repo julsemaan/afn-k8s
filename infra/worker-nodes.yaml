@@ -11,7 +11,7 @@
   tasks:
   - name: Install k3s agent
     shell: |
-      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://{{hostvars[groups['controlPlane'][0]]['ansible_eth0']['ipv4']['address']}}:6443 --token {{hostvars[groups['controlPlane'][0]]["join_token"].stdout}} --node-ip {{ ansible_eth0.ipv4.address }} --node-external-ip {{ ansible_eth0.ipv4.address }}" sh -
+      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://{{hostvars[groups['controlPlane'][0]]['ansible_default_ipv4']['address']}}:6443 --token {{hostvars[groups['controlPlane'][0]]["join_token"].stdout}} --node-ip {{ ansible_eth0.ipv4.address }} --node-external-ip {{ ansible_eth0.ipv4.address }}" sh -
 
 
 
