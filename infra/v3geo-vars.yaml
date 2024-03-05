@@ -9,13 +9,29 @@ password: !vault |
           64613731376338383061376565393933623731323161343061376232643331346531
 
 
-group: afn-geo-wg-v3
-label: afn-v3-wg-
+group: afn-geo-v3
+label: afn-v3-
 linodes:
   control:
     region: us-ord
     instanceType: g6-standard-1
     typeTag: controlPlane
+  srv-gru-1:
+    region: br-gru
+    instanceType: g6-nanode-1
+    typeTag: workerNode
+  srv-maa-1:
+    region: in-maa
+    instanceType: g6-nanode-1
+    typeTag: workerNode
+  srv-mil-1:
+    region: it-mil
+    instanceType: g6-nanode-1
+    typeTag: workerNode
+  srv-ord-2:
+    region: us-ord
+    instanceType: g6-nanode-1
+    typeTag: workerNode
   srv-sgp-1:
     region: ap-south
     instanceType: g6-nanode-1
