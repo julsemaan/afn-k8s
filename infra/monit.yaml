@@ -20,3 +20,26 @@
         name: monit
         state: restarted
 
+- name: Postfix configuration
+  hosts: controlPlane:workerNode
+  tasks:
+    - name: install the latest version of postfix
+      package:
+        name: postfix
+        state: latest
+    - name: install postfix configuration
+      copy:
+        src: conf/postfix-main.cf
+        dest: /etc/postfix/main.cf
+    - name: install postfix configuration
+      copy:
+        src: ../secret/sasl_passwd.db
+        dest: /etc/postfix/sasl_passwd.db
+    - name: enable postfix
+      command: systemctl enable postfix
+    - name: restart postfix
+      service:
+        name: postfix
+        state: restarted
+
+
