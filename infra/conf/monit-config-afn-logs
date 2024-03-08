@@ -1,4 +1,4 @@
-check file logs with path /logs/syslog
+check file logs with path /mnt/logs/syslog
   ignore content = "context canceled"
   ignore content = "monit"
   ignore content = "client disconnected"
