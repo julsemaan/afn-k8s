@@ -12,7 +12,7 @@
     - name: copy the monit configuration
       copy:
         src: conf/monit-config
-        dest: /etc/monit.d/anyfile-notepad.conf
+        dest: /etc/monit/conf.d/anyfile-notepad.conf
     - name: enable monit
       command: systemctl enable monit
     - name: restart monit
