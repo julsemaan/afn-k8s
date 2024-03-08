@@ -23,3 +23,6 @@
 - name: Setup worker nodes
   import_playbook: worker-nodes.yaml
 
+- name: Setup monit
+  import_playbook: monit.yaml
+
