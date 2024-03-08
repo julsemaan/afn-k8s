@@ -13,7 +13,7 @@
     register: eth0_ip
 
 
-- name: Join worker nodes to netmaker
+- name: Join worker nodes to cluster
   hosts: workerNode
   tasks:
   - name: Install k3s agent
