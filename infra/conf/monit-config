@@ -31,29 +31,3 @@ set httpd port 2812 and
   allow 127.0.0.1        # allow localhost to connect to the server
   allow ::1              # allow localhost to connect to the server
 
-check file logs with path /logs/syslog
-  ignore content = "context canceled"
-  ignore content = "monit"
-  ignore content = "client disconnected"
-  ignore content = "use of closed network connection"
-  ignore content = "request declared a Content-Length"
-  ignore content = "CANCEL"
-  ignore content = "NOERROR"
-  ignore content = "unable to determine directory for user configuration"
-  ignore content = "http2: stream closed"
-  ignore content = "aborting with incomplete response"
-  ignore content = ".status.:404"
-  ignore content = "last_finalization_error"
-  ignore content = "gpgconf: error running"
-  ignore content = "Error encountered from Stripe"
-  ignore content = "no information found to solve challenge for identifier"
-  ignore content = "phpshells"
-  ignore content = "card_error"
-  ignore content = ".php"
-  ignore content = "Record conflict - CNAMES must be unique"
-  ignore content = "31mERROR#033"
-  ignore content = "http.log.access.log"
-  if match "ERROR" then alert
-  if match "error" then alert
-  if match "Error" then alert
-
