@@ -31,7 +31,7 @@
       copy:
         src: conf/postfix-main.cf
         dest: /etc/postfix/main.cf
-    - name: install postfix configuration
+    - name: install postfix sasl passwd DB
       copy:
         src: ../secret/sasl_passwd.db
         dest: /etc/postfix/sasl_passwd.db
