@@ -31,7 +31,7 @@ set httpd port 2812 and
   allow 127.0.0.1        # allow localhost to connect to the server
   allow ::1              # allow localhost to connect to the server
 
-check file logs with path /var/log/syslog
+check file logs with path /logs/syslog
   ignore content = "context canceled"
   ignore content = "monit"
   ignore content = "client disconnected"
