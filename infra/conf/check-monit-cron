@@ -1,0 +1,3 @@
+# Validate monit is always running
+*/5 * * * * if ! /bin/systemctl status monit > /dev/null 2>&1 ; then echo "Monit is not running on $HOSTNAME" ; fi
+

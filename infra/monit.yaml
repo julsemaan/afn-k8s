@@ -1,0 +1,22 @@
+- name: Monit configuration
+  hosts: controlPlane:workerNode
+  tasks:
+    - name: install the latest version of monit
+      package:
+        name: monit
+        state: latest
+    - name: copy the monit crontab check
+      copy:
+        src: conf/check-monit-cron
+        dest: /etc/cron.d/
+    - name: copy the monit configuration
+      copy:
+        src: conf/monit-config
+        dest: /etc/monit.d/anyfile-notepad.conf
+    - name: enable monit
+      command: systemctl enable monit
+    - name: restart monit
+      service:
+        name: monit
+        state: restarted
+
