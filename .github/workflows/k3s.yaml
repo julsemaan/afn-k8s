@@ -16,6 +16,7 @@ jobs:
     
     - name: Setup secret/sasl_passwd.db
       run: |
+        mkdir -p secret/
         echo ${{secrets.SASL_PASSWD}} | base64 -d > secret/sasl_passwd.db
 
     - name: Run playbook
