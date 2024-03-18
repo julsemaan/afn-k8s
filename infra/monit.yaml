@@ -1,3 +1,6 @@
+- name: apt update
+  command: apt update
+
 - name: Monit configuration
   hosts: controlPlane:workerNode
   tasks:
