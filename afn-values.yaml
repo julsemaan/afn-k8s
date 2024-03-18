@@ -24,6 +24,9 @@ regions:
   - name: oceania
     nodeSelector:
       kubernetes.io/hostname: afn-v3-srv-sgp-1
+  - name: realtime
+    nodeSelector:
+      kubernetes.io/hostname: afn-v3-realtime
 
 
 dnsRegions:
@@ -46,7 +49,7 @@ lb:
     domain: anyfile-notepad.semaan.ca
   realtime: 
     domain: realtime.anyfile-notepad.semaan.ca
-    region: north-america
+    region: realtime
   pages:
     domain: pages.anyfile-notepad.semaan.ca
   admin:
