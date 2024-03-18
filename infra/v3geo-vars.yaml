@@ -16,6 +16,10 @@ linodes:
     region: us-ord
     instanceType: g6-standard-1
     typeTag: controlPlane
+  realtime:
+    region: us-ord
+    instanceType: g6-standard-1
+    typeTag: workerNode
   srv-gru-1:
     region: br-gru
     instanceType: g6-nanode-1
