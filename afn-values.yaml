@@ -49,7 +49,7 @@ lb:
     domain: anyfile-notepad.semaan.ca
   realtime: 
     domain: realtime.anyfile-notepad.semaan.ca
-    region: realtime
+    region: realtime-region
   pages:
     domain: pages.anyfile-notepad.semaan.ca
   admin:
