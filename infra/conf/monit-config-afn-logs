@@ -20,6 +20,7 @@ check file logs with path /mnt/logs/syslog
   ignore content = "Record conflict - CNAMES must be unique"
   ignore content = "31mERROR#033"
   ignore content = "http.log.access.log"
+  ignore content = "external-dns"
   if match "ERROR" then alert
   if match "error" then alert
   if match "Error" then alert
