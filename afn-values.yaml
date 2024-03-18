@@ -24,7 +24,7 @@ regions:
   - name: oceania
     nodeSelector:
       kubernetes.io/hostname: afn-v3-srv-sgp-1
-  - name: realtime
+  - name: realtime-region
     nodeSelector:
       kubernetes.io/hostname: afn-v3-realtime
 
