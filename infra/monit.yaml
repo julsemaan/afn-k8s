@@ -1,9 +1,9 @@
-- name: apt update
-  command: apt update
-
 - name: Monit configuration
   hosts: controlPlane:workerNode
   tasks:
+    - name: apt update
+      command: apt update
+
     - name: install the latest version of monit
       package:
         name: monit
