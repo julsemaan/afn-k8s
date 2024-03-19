@@ -5,6 +5,7 @@ X Restart lb when cert changes
 - Trigger restart of afn-patch-coredns when the cm changes
 X Get syslog server back in place
 - Test monit crontab alerting
+- Restart backend after changes in afn-secret
 
 - Add API with a PVC to the chart
 X Install linode api secrets via GHA

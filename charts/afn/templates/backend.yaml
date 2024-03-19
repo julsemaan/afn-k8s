@@ -9,6 +9,7 @@ metadata:
   namespace: {{ $context.Release.Namespace }}
   labels:
     {{- include "afn.labels" $context | nindent 4 }}
+    app: backend
     app.region: backend-{{ include "afn.fullname" $context }}-{{ .name }}
 spec:
   selector:
