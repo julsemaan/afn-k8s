@@ -54,6 +54,8 @@ lb:
     domain: pages.anyfile-notepad.semaan.ca
   admin:
     domain: admin.anyfile-notepad.semaan.ca
+  api:
+    domain: api.anyfile-notepad.semaan.ca
 
 geodns:
   image:
