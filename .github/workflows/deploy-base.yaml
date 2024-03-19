@@ -27,16 +27,16 @@ jobs:
       env:
         LINODE_ACCESS_TOKEN: ${{ secrets.LINODE_ACCESS_TOKEN }}
         STRIPE_SK: ${{ secrets.STRIPE_SK }}
-        STRIPE_PP_PLAN: ${{ env.STRIPE_PP_PLAN }}
+        STRIPE_PP_PLAN: ${{ vars.STRIPE_PP_PLAN }}
         STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-        AFN_SUPPORT_EMAIL: ${{ env.AFN_SUPPORT_EMAIL }}
+        AFN_SUPPORT_EMAIL: ${{ vars.AFN_SUPPORT_EMAIL }}
         CLUSTER_OBSERVER_USERNAME: ${{ secrets.CLUSTER_OBSERVER_USERNAME }}
         CLUSTER_OBSERVER_PASSWORD: ${{ secrets.CLUSTER_OBSERVER_PASSWORD }}
-        SMTP_HOST: ${{ env.SMTP_HOST }}
-        SMTP_PORT: ${{ env.SMTP_PORT }}
+        SMTP_HOST: ${{ vars.SMTP_HOST }}
+        SMTP_PORT: ${{ vars.SMTP_PORT }}
         SMTP_USER: ${{ secrets.SMTP_USER }}
         SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-        SMTP_FROM: ${{ env.SMTP_FROM }}
+        SMTP_FROM: ${{ vars.SMTP_FROM }}
 
     - uses: tale/kubectl-action@v1
       with:
