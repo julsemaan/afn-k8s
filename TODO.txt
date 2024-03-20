@@ -6,6 +6,7 @@ X Restart lb when cert changes
 X Get syslog server back in place
 - Test monit crontab alerting
 - Restart backend after changes in afn-secret
+- Backend (especialy realtime) persistent storage for events
 
 - Add API with a PVC to the chart
 X Install linode api secrets via GHA
