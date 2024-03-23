@@ -1,5 +1,5 @@
 - name: Get join token
-  hosts: controlPlane
+  hosts: {{prefix}}controlPlane
   tasks:
   - name: Get join token from control plane node
     shell: |
@@ -14,7 +14,7 @@
 
 
 - name: Join worker nodes to cluster
-  hosts: workerNode
+  hosts: {{prefix}}workerNode
   tasks:
   - name: Install k3s agent
     shell: |

@@ -27,7 +27,8 @@ jobs:
         requirements: infra/requirements.yaml
         # Optional, additional flags to pass to ansible-playbook
         options: |
-          -e @infra/v3geo-vars.yaml
+          -e @${{vars.INFRA_VARS}}
+          -e prefix=${{vars.INFRA_PREFIX}}
           -e token=${{secrets.LINODE_ACCESS_TOKEN}}
           --verbose
 

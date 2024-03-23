@@ -15,29 +15,29 @@ linodes:
   control:
     region: us-ord
     instanceType: g6-standard-1
-    typeTag: controlPlane
+    typeTag: main-controlPlane
   realtime:
     region: us-ord
     instanceType: g6-standard-1
-    typeTag: workerNode
+    typeTag: main-workerNode
   srv-gru-1:
     region: br-gru
     instanceType: g6-nanode-1
-    typeTag: workerNode
+    typeTag: main-workerNode
   srv-maa-1:
     region: in-maa
     instanceType: g6-nanode-1
-    typeTag: workerNode
+    typeTag: main-workerNode
   srv-mil-1:
     region: it-mil
     instanceType: g6-nanode-1
-    typeTag: workerNode
+    typeTag: main-workerNode
   srv-ord-2:
     region: us-ord
     instanceType: g6-nanode-1
-    typeTag: workerNode
+    typeTag: main-workerNode
   srv-sgp-1:
     region: ap-south
     instanceType: g6-nanode-1
-    typeTag: workerNode
+    typeTag: main-workerNode
 

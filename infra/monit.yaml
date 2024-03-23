@@ -1,5 +1,5 @@
 - name: Monit configuration
-  hosts: controlPlane:workerNode
+  hosts: {{prefix}}controlPlane:{{prefix}}workerNode
   tasks:
     - name: apt update
       command: apt update
@@ -14,7 +14,7 @@
         dest: /etc/cron.d/
 
 - name: Monit ctrl-plane configuration
-  hosts: controlPlane
+  hosts: {{prefix}}controlPlane
   tasks:
     - name: copy the monit ctrl-plane specific configuration
       copy:
@@ -22,7 +22,7 @@
         dest: /etc/monit/conf.d/anyfile-notepad-logs.conf
 
 - name: Monit common configuration
-  hosts: controlPlane:workerNode
+  hosts: {{prefix}}controlPlane:{{prefix}}workerNode
   tasks:
     - name: copy the monit configuration
       copy:
@@ -36,7 +36,7 @@
         state: restarted
 
 - name: Postfix configuration
-  hosts: controlPlane:workerNode
+  hosts: {{prefix}}controlPlane:{{prefix}}workerNode
   tasks:
     - name: install the latest version of postfix
       package:
