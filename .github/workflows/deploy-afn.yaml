@@ -9,6 +9,9 @@ on:
   workflow_dispatch:
     branches: ['**']
 
+concurrency:
+  group: deployments
+  cancel-in-progress: false
 
 jobs:
   deployment:
