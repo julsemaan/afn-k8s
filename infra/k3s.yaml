@@ -1,5 +1,5 @@
 - name: Basic setup
-  hosts: {{prefix}}controlPlane:{{prefix}}workerNode
+  hosts: "{{prefix}}controlPlane:{{prefix}}workerNode"
   tasks:
   - name: Set hostname
     command: hostnamectl set-hostname {{inventory_hostname}}

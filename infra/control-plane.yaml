@@ -1,5 +1,5 @@
 - name: Setup basic control plane
-  hosts: {{prefix}}controlPlane
+  hosts: "{{prefix}}controlPlane"
   tasks:
   - name: Install k3s server
     shell: |
