@@ -5,7 +5,7 @@ on:
     branches: ['main']
     paths:
       - 'charts/afn/**'
-      - '.github/workflows/deploy-afn.yml'
+      - '.github/workflows/deploy-afn.yaml'
   workflow_dispatch:
     branches: ['**']
     inputs:
