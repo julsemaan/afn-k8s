@@ -19,17 +19,17 @@ dnsRegions:
     target: north-america
     default: true
 
-lb:
-  app:
-    domain: test.anyfile-notepad.semaan.ca
-  realtime: 
-    domain: realtime.test.anyfile-notepad.semaan.ca
-  pages:
-    domain: pages.test.anyfile-notepad.semaan.ca
-  admin:
-    domain: admin.test.anyfile-notepad.semaan.ca
-  api:
-    domain: api.test.anyfile-notepad.semaan.ca
+#lb:
+#  app:
+#    domain: test.anyfile-notepad.semaan.ca
+#  realtime: 
+#    domain: realtime.test.anyfile-notepad.semaan.ca
+#  pages:
+#    domain: pages.test.anyfile-notepad.semaan.ca
+#  admin:
+#    domain: admin.test.anyfile-notepad.semaan.ca
+#  api:
+#    domain: api.test.anyfile-notepad.semaan.ca
 
 geodns:
   image:
