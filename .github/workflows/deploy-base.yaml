@@ -89,7 +89,7 @@ jobs:
         chart: 'oci://registry-1.docker.io/bitnamicharts/external-dns'
         value-files: >-
           [
-            "external-dns-values.yaml"
+            "${{vars.EXTERNAL_DNS_VALUES_PATH}}"
           ]
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
