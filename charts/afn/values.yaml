@@ -32,7 +32,7 @@ backend:
   imagePullSecrets: []
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/webserver
-    tag: 69c260a363a617a3593f23373631110d9d870ce8
+    tag: 54aa655f296430a74aa4979a9e6811e62e48194c
     pullPolicy: IfNotPresent
   appProdImage:
     repository: ghcr.io/julsemaan/anyfile-notepad/client-light
