@@ -7,8 +7,10 @@ X Test monit crontab alerting
 X Restart backend after changes in afn-secret
 X Backend (especialy realtime) persistent storage
 - Wrap up anyfile-notepad repo build process and PRs update to afn-k8s repo
+  - Prevent concurrency race conditions for the branch+PR step
 - Health check on doing a DNS lookup to test connectivity 
 - Add API with a PVC to the chart
+- Build geodns via GHA and use auto-PR workflow
 
 X Install linode api secrets via GHA
 - Add monit checks for OS level
@@ -18,3 +20,6 @@ X Install linode api secrets via GHA
 
 - Have a monitoring job for node-local-dns that sends metrics to prometheus
   watch bash -c "time dig kube-dns.kube-system.svc.cluster.local"'
+
+- Implement auto-detection of dark mode
+- Use JWT instead of session ID for afn-pp session (no need to sync sessions after)

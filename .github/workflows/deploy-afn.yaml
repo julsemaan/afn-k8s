@@ -1,6 +1,11 @@
 name: Deploy AFN helm chart
 
 on:
+  push:
+    branches: ['main']
+    paths:
+      - 'charts/afn/**'
+      - '.github/workflows/deploy-afn.yml'
   workflow_dispatch:
     branches: ['**']
 
