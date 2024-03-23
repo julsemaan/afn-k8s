@@ -16,6 +16,9 @@
   - name: Setup cron to watch flannel failure and restart k3s
     shell: |
       echo '*/5 * * * * root /bin/bash -c "if ! ip route | /usr/bin/grep flannel; then /usr/bin/systemctl restart k3s-agent.service; fi"' > /etc/cron.d/watchdog-flannel
+  - name: Setup cron to watch for monit running
+    shell: |
+      echo '*/5 * * * * if ! /bin/systemctl status monit > /dev/null 2>&1 ; then echo "Monit is not running on $HOSTNAME" ; fi' > /etc/cron.d/watchdog-monit
 
 - name: Setup control plane
   import_playbook: control-plane.yaml
