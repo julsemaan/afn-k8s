@@ -11,7 +11,7 @@ linode:
 logLevel: trace
 
 domainFilters: 
-  - semaan.ca
+  - v3geo-test.semaan.ca
 
 fqdnTemplates:
   - "{{.Name}}.v3geo-test.semaan.ca"
