@@ -3,10 +3,14 @@ name: Deploy AFN VMs
 on:
   workflow_dispatch:
     branches: ['**']
+    inputs:
+      environment:
+        type: environment
 
 
 jobs:
   deployment:
+    environment: ${{ github.event.inputs.environment || 'main' }}
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v4

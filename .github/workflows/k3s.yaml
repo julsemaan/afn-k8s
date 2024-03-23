@@ -3,10 +3,14 @@ name: Deploy AFN ansible playbooks (k3s)
 on:
   workflow_dispatch:
     branches: ['**']
+    inputs:
+      environment:
+        type: environment
 
 
 jobs:
   deployment:
+    environment: ${{ github.event.inputs.environment || 'main' }}
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v4
