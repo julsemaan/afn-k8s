@@ -14,14 +14,16 @@
   - name: Configure /etc/resolv.conf
     shell: echo "nameserver 8.8.8.8" > /etc/resolv.conf
   - name: Setup cron to watch flannel failure and restart k3s
-    shell: |
-      echo '*/5 * * * * root /bin/bash -c "if ! ip route | /usr/bin/grep flannel; then /usr/bin/systemctl restart k3s-agent.service; fi"' > /etc/cron.d/watchdog-flannel
+    copy: 
+      dest: /etc/cron.d/watchdog-flannel
+      content: |
+        */5 * * * * root /bin/bash -c "if ! ip route | /usr/bin/grep flannel; then /usr/bin/systemctl restart k3s-agent.service; fi"
   - name: Setup cron to watch for monit running
     copy: 
       dest: /etc/cron.d/watchdog-monit
       content: |
         MAILTO="admin@semaan.ca"
-        * * * * * root if ! /bin/systemctl status monit > /dev/null 2>&1 ; then echo "Monit is not running" ; fi
+        */5 * * * * root if ! /bin/systemctl status monit > /dev/null 2>&1 ; then echo "Monit is not running" ; fi
 
 - name: Setup control plane
   import_playbook: control-plane.yaml
