@@ -3,6 +3,9 @@ name: Deploy AFN base dependencies
 on:
   workflow_dispatch:
     branches: ['**']
+    inputs:
+      environment:
+        type: environment
 
 
 jobs:
