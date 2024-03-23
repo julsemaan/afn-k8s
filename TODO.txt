@@ -6,8 +6,8 @@ X Get syslog server back in place
 X Test monit crontab alerting
 X Restart backend after changes in afn-secret
 X Backend (especialy realtime) persistent storage
-- Wrap up anyfile-notepad repo build process and PRs update to afn-k8s repo
-  - Prevent concurrency race conditions for the branch+PR step
+X Wrap up anyfile-notepad repo build process and PRs update to afn-k8s repo
+  X Prevent concurrency race conditions for the branch+PR step
 - Health check on doing a DNS lookup to test connectivity 
 - Add API with a PVC to the chart
 - Build geodns via GHA and use auto-PR workflow
