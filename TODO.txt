@@ -7,6 +7,7 @@ X Get syslog server back in place
 - Test monit crontab alerting
 X Restart backend after changes in afn-secret
 X Backend (especialy realtime) persistent storage
+- Wrap up anyfile-notepad repo build process and PRs update to afn-k8s repo
 
 - Add API with a PVC to the chart
 X Install linode api secrets via GHA
