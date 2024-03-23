@@ -25,6 +25,8 @@ lb:
     domain: admin.DOMAIN_NAME
   app:
     domain: app.DOMAIN_NAME
+  api:
+    domain: api.DOMAIN_NAME
   realtime:
     domain: realtime.DOMAIN_NAME
     region: null
