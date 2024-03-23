@@ -59,7 +59,7 @@ jobs:
         chart: 'charts/nodelocaldns'
         value-files: >-
           [
-            "afn-values.yaml"
+            "${{vars.AFN_VALUES_PATH}}"
           ]
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
