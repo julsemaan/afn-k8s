@@ -3,9 +3,7 @@
 # Declare variables to be passed into your templates.
 
 geoDomain: DOMAIN_NAME
-
 dnsRegions: []
-
 lb:
   imagePullSecrets: []
   image:
@@ -30,7 +28,6 @@ lb:
   realtime:
     domain: realtime.DOMAIN_NAME
     region: null
-
 backend:
   imagePullSecrets: []
   image:
@@ -45,7 +42,6 @@ backend:
     repository: ghcr.io/julsemaan/anyfile-notepad/client-light
     tag: 69c260a363a617a3593f23373631110d9d870ce8
     pullPolicy: IfNotPresent
-
 geodns:
   imagePullSecrets: []
   image:
@@ -53,15 +49,10 @@ geodns:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "latest"
-
 controlRegion: {}
-
 regions: []
-
-
 nameOverride: ""
 fullnameOverride: ""
-
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -70,34 +61,30 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
 podAnnotations: {}
-
 podSecurityContext: {}
-  # fsGroup: 2000
+# fsGroup: 2000
 
 securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+# capabilities:
+#   drop:
+#   - ALL
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsUser: 1000
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# limits:
+#   cpu: 100m
+#   memory: 128Mi
+# requests:
+#   cpu: 100m
+#   memory: 128Mi
 
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
