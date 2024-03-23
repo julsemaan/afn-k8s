@@ -1,3 +1,4 @@
+- Setup GH environment if needed
 - Deploy GHA VMs
 - Run the K3S GHA
 - Extract the kubeconfig from /etc/rancher/k3s/k3s.yaml and configure it in the GHA secrets (KUBECONFIG)

@@ -1,0 +1,36 @@
+
+baseDomain: semaan.ca
+geoDomain: v3geo-test.semaan.ca
+
+controlRegion:
+  name: control
+  nodeSelectorConfig:
+    key: kubernetes.io/hostname
+    value: afn-v3-control
+
+regions:
+  - name: north-america
+    nodeSelector:
+      kubernetes.io/hostname: afn-v3-test-srv-mia-1
+
+
+dnsRegions:
+  - name: north-america
+    target: north-america
+    default: true
+
+lb:
+  app:
+    domain: test.anyfile-notepad.semaan.ca
+  realtime: 
+    domain: realtime.test.anyfile-notepad.semaan.ca
+  pages:
+    domain: pages.test.anyfile-notepad.semaan.ca
+  admin:
+    domain: admin.test.anyfile-notepad.semaan.ca
+  api:
+    domain: api.test.anyfile-notepad.semaan.ca
+
+geodns:
+  image:
+    pullPolicy: Always
