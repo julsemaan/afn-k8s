@@ -1,0 +1,37 @@
+sources:
+  - node
+  - service
+  - crd
+
+provider: linode
+
+linode:
+  secretName: linode-api-token
+
+logLevel: trace
+
+domainFilters: 
+  - semaan.ca
+
+fqdnTemplates:
+  - "{{.Name}}.v3geo-test.semaan.ca"
+
+policy: sync
+
+crd:
+  create: true
+
+rbac:
+  create: true
+
+logLevel: trace
+
+managedRecordTypesFilters:
+  - A
+  - CNAME
+  - NS
+
+image:
+  repository: julsemaan/external-dns
+  tag: latest
+  pullPolicy: Always
