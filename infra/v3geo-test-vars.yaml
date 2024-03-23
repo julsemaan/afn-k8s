@@ -10,7 +10,7 @@ password: !vault |
 
 
 group: afn-geo-v3-test
-label: afn-v3-test
+label: afn-v3-test-
 linodes:
   control:
     region: us-mia

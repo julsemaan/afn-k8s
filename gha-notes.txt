@@ -3,6 +3,6 @@
 - Run the K3S GHA
 - Extract the kubeconfig from /etc/rancher/k3s/k3s.yaml and configure it in the GHA secrets (KUBECONFIG)
   - NOTE: k3s.yaml will point to 127.0.0.1, change for the public IP
-- Set the correct syslog IP in the fluentbit helm values
-- Ensure hostnames are accurate in afn-values.yaml
+- Ensure hostnames are accurate in afn-values-xyz.yaml
 - Deploy GHA base dependencies
+- Deploy GHA AFN
