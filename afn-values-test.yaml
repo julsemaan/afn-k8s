@@ -6,7 +6,7 @@ controlRegion:
   name: control
   nodeSelectorConfig:
     key: kubernetes.io/hostname
-    value: afn-v3-control
+    value: afn-v3-test-control
 
 regions:
   - name: north-america
