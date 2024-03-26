@@ -323,20 +323,23 @@ spec:
     # The default value is Issuer (i.e. a locally namespaced Issuer)
     kind: ClusterIssuer
     group: cert-manager.io
-#---
-#apiVersion: cert-manager.io/v1
-#kind: Certificate
-#metadata:
-#  name: app-crt
-#  namespace: {{ .Release.Namespace }}
-#spec:
-#  secretName: lb-crt-secret
-#  dnsNames:
-#  - {{ $context.Values.lb.app.domain }}
-#  - {{ $context.Values.lb.realtime.domain }}
-#  issuerRef:
-#    name: letsencrypt-production
-#    # We can reference ClusterIssuers by changing the kind here.
-#    # The default value is Issuer (i.e. a locally namespaced Issuer)
-#    kind: ClusterIssuer
-#    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: app-crt
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: app-crt-secret
+  dnsNames:
+  - {{ $context.Values.lb.app.domain }}
+  - {{ $context.Values.lb.realtime.domain }}
+  - {{ $context.Values.lb.pages.domain }}
+  - {{ $context.Values.lb.admin.domain }}
+  - {{ $context.Values.lb.api.domain }}
+  issuerRef:
+    name: letsencrypt-production
+    # We can reference ClusterIssuers by changing the kind here.
+    # The default value is Issuer (i.e. a locally namespaced Issuer)
+    kind: ClusterIssuer
+    group: cert-manager.io
