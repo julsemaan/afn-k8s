@@ -43,6 +43,8 @@ jobs:
         SMTP_FROM: ${{ vars.SMTP_FROM }}
         AFN_REST_USERNAME: ${{ secrets.AFN_REST_USERNAME }}
         AFN_REST_PASSWORD: ${{ secrets.AFN_REST_PASSWORD }}
+        OBJ_ACCESS_KEY: ${{ secrets.OBJ_ACCESS_KEY }}
+        OBJ_SECRET_KEY: ${{ secrets.OBJ_SECRET_KEY }}
 
     - uses: tale/kubectl-action@v1
       with:
