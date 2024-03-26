@@ -13,6 +13,7 @@ X Wrap up anyfile-notepad repo build process and PRs update to afn-k8s repo
   - Handle race condition if API starts before inotify is looking
   - Periodic upload of all DBs to OBJ
 - Build geodns via GHA and use auto-PR workflow
+- Automate periodic builds of custom images
 
 X Install linode api secrets via GHA
 - Add monit checks for OS level

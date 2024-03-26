@@ -214,9 +214,9 @@ spec:
               cd $WATCH_DIR
 
               while true; do
-                sleep $INTERVAL
                 echo "Syncing to $BUCKET"
                 s3cmd --no-preserve --access_key=$OBJ_ACCESS_KEY --secret_key=$OBJ_SECRET_KEY sync ./ s3://$BUCKET
+                sleep $INTERVAL
               done
 
           volumeMounts:
@@ -256,8 +256,6 @@ spec:
               fi
 
               cd $WATCH_DIR
-
-              s3cmd --no-preserve --access_key=$OBJ_ACCESS_KEY --secret_key=$OBJ_SECRET_KEY sync  s3://$BUCKET ./
 
               inotifywait \
                 --monitor \
