@@ -19,6 +19,9 @@ dnsRegions:
     target: north-america
     default: true
 
+api:
+  bucket: afn-test-23d9g
+
 #lb:
 #  app:
 #    domain: test.anyfile-notepad.semaan.ca

@@ -9,7 +9,9 @@ X Backend (especialy realtime) persistent storage
 X Wrap up anyfile-notepad repo build process and PRs update to afn-k8s repo
   X Prevent concurrency race conditions for the branch+PR step
 - Health check on doing a DNS lookup to test connectivity 
-- Add API with a PVC to the chart
+- Add API with backed by OBJ to the chart
+  - Handle race condition if API starts before inotify is looking
+  - Periodic upload of all DBs to OBJ
 - Build geodns via GHA and use auto-PR workflow
 
 X Install linode api secrets via GHA
