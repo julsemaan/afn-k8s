@@ -33,7 +33,7 @@ lb:
 api:
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/api
-    tag: feat-deploy-afn-k8s
+    tag: b13e4aec2f0c3f0b1688397705ce92acd5e5b61a
     pullPolicy: IfNotPresent
 backend:
   image:
@@ -94,5 +94,4 @@ resources: {}
 nodeSelector: {}
 tolerations: []
 affinity: {}
-
 #test
