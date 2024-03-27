@@ -1,6 +1,11 @@
 name: Deploy AFN base dependencies
 
 on:
+  push:
+    branches: ['main']
+    paths:
+      # There should be more here but that's a start
+      - 'templates-secrets/**'
   workflow_dispatch:
     branches: ['**']
     inputs:
