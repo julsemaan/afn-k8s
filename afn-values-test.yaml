@@ -22,17 +22,17 @@ dnsRegions:
 api:
   bucket: afn-test-23d9g
 
-#lb:
-#  app:
-#    domain: test.anyfile-notepad.semaan.ca
-#  realtime: 
-#    domain: realtime.test.anyfile-notepad.semaan.ca
-#  pages:
-#    domain: pages.test.anyfile-notepad.semaan.ca
-#  admin:
-#    domain: admin.test.anyfile-notepad.semaan.ca
-#  api:
-#    domain: api.test.anyfile-notepad.semaan.ca
+lb:
+  app:
+    domain: lb-app.v3geo-test.semaan.ca
+  realtime: 
+    domain: lb-realtime.v3geo-test.semaan.ca
+  pages:
+    domain: lb-pages.v3geo-test.semaan.ca
+  admin:
+    domain: lb-admin.v3geo-test.semaan.ca
+  api:
+    domain: lb-api.v3geo-test.semaan.ca
 
 geodns:
   image:

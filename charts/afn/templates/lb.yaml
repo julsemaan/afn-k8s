@@ -255,7 +255,7 @@ spec:
   - dnsName: {{ $context.Values.lb.api.domain }}
     recordType: CNAME
     targets:
-    - srv.semaan.ca
+    - c.{{ .Values.geoDomain }}
 ---
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
@@ -267,7 +267,6 @@ spec:
   - dnsName: {{ $context.Values.lb.pages.domain }}
     recordType: CNAME
     targets:
-    #- srv.semaan.ca
     - c.{{ .Values.geoDomain }}
 ---
 apiVersion: externaldns.k8s.io/v1alpha1
@@ -280,7 +279,6 @@ spec:
   - dnsName: {{ $context.Values.lb.admin.domain }}
     recordType: CNAME
     targets:
-    #- srv.semaan.ca
     - c.{{ .Values.geoDomain }}
 ---
 apiVersion: cert-manager.io/v1
