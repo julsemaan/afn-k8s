@@ -102,15 +102,6 @@ spec:
             - name: app-crt
               mountPath: /etc/caddy/app-crt
               readOnly: true
-            - name: realtime-crt
-              mountPath: /etc/caddy/realtime-crt
-              readOnly: true
-            - name: pages-crt
-              mountPath: /etc/caddy/pages-crt
-              readOnly: true
-            - name: admin-crt
-              mountPath: /etc/caddy/admin-crt
-              readOnly: true
             - name: pages
               mountPath: /pages
             - name: admin
