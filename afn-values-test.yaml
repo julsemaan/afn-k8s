@@ -12,7 +12,9 @@ regions:
   - name: north-america
     nodeSelector:
       kubernetes.io/hostname: afn-v3-test-srv-mia-1
-
+  - name: europe
+    nodeSelector:
+      kubernetes.io/hostname: afn-v3-test-srv-mil-1
 
 dnsRegions:
   - name: north-america
