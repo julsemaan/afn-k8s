@@ -8,14 +8,15 @@ X Restart backend after changes in afn-secret
 X Backend (especialy realtime) persistent storage
 X Wrap up anyfile-notepad repo build process and PRs update to afn-k8s repo
   X Prevent concurrency race conditions for the branch+PR step
-- Health check on doing a DNS lookup to test connectivity 
 X Add API with backed by OBJ to the chart
   X Handle race condition if API starts before inotify is looking
   X Periodic upload of all DBs to OBJ
 - Build geodns via GHA and use auto-PR workflow
-- Automate periodic builds of custom images
+- Build API via GHA and use auto-PR workflow
+- Automate periodic builds of rsyslog image
 - Debounce SUBMIT on contact form
 - Have API statefulset have affinity to ORD or GRU or other lower latency places
+- Health check on doing a DNS lookup to test connectivity 
 
 X Install linode api secrets via GHA
 - Add monit checks for OS level
