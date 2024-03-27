@@ -145,16 +145,7 @@ spec:
           secretName: lb-ctrl-plane-crt-secret
       - name: app-crt
         secret:
-          secretName: app-crt-secret-tmp
-      - name: realtime-crt
-        secret:
-          secretName: realtime-crt-secret-tmp
-      - name: pages-crt
-        secret:
-          secretName: pages-crt-secret-tmp
-      - name: admin-crt
-        secret:
-          secretName: admin-crt-secret-tmp
+          secretName: app-crt-secret
       - name: {{ .name }}-crt
         secret:
           secretName: {{ .name }}-crt-secret
