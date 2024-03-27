@@ -26,3 +26,4 @@ COPY GeoLite2-Country.mmdb /usr/share/GeoIP/
 COPY geodns.conf dns/
 
 ENTRYPOINT ["/geodns"]
+
