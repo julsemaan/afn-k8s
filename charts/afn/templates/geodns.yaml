@@ -144,6 +144,51 @@ metadata:
   name: {{ include "afn.fullname" $context }}-geodns-{{ $context.Release.Revision }}
   namespace: {{ $context.Release.Namespace }}
 data:
+  geodns.conf: |
+    ; GeoDNS configuration file
+    ;
+    ; It is recommended to distribute the configuration file globally
+    ; with your .json zone files.
+
+    [dns]
+    # allow _status queries from anywhere (versus only localhost)
+    publicdebugqueries = false
+    # include query label in prometheus metrics
+    detailedmetrics    = true
+
+    [geoip]
+    ;; Directory containing the GeoIP2 .mmdb database files; defaults
+    ;; to looking through a list of common directories looking for one
+    ;; of those that exists.
+    directory=/usr/share/GeoIP/
+
+    [querylog]
+    ;; directory to save query logs; disabled if not specified
+    path = log/queries.log
+    ;; max size per file in megabytes before rotating (default 200)
+    ; maxsize = 100
+    ;; keep up to this many rotated log files (default 1)
+    ; keep = 2
+
+
+    ;; avro logging will replace the json querylog if configured
+    ; [avrolog]
+    ;; The avro schema is specified in https://github.com/abh/geodns/blob/main/querylog/querylog.avsc
+    ;; files being written are suffixed .tmp; closed files are suffixed .avro
+    ; path = log/avro/
+    ;; rotate file after it reaches this size
+    ; maxsize = 5000000
+    ;; rotate the file after this many seconds
+    ; maxtime = 10s
+
+    [http]
+    ; require basic HTTP authentication; not encrypted or safe over the public internet
+    ; user = stats
+    ; password = Aeteereun8eoth4
+
+    [health]
+    ; directory = dns/health
+
   {{ .Values.geoDomain }}.json: |
     {
         "serial": 1,
