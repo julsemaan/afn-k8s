@@ -110,6 +110,7 @@ spec:
   selector:
     matchLabels:
       {{- include "afn.selectorLabels" $context | nindent 6 }}
+  serviceName: api
   template:
     metadata:
       {{- with $context.Values.podAnnotations }}
