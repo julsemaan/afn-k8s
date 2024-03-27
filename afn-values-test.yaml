@@ -20,6 +20,8 @@ dnsRegions:
   - name: north-america
     target: north-america
     default: true
+  - name: europe
+    target: europe
 
 api:
   bucket: afn-test-23d9g
