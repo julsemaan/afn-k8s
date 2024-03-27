@@ -74,19 +74,13 @@ data:
     }
     
     {{ $context.Values.lb.realtime.domain }} {
-      tls /etc/caddy/realtime-crt/tls.crt /etc/caddy/realtime-crt/tls.key
-
-      import afn_webserver
-    }
-    
-    lb.{{ $context.Values.geoDomain }} {
-      tls /etc/caddy/lb-crt/tls.crt /etc/caddy/lb-crt/tls.key
+      tls /etc/caddy/app-crt/tls.crt /etc/caddy/app-crt/tls.key
 
       import afn_webserver
     }
     
     {{ $context.Values.lb.pages.domain }} {
-      tls /etc/caddy/pages-crt/tls.crt /etc/caddy/pages-crt/tls.key
+      tls /etc/caddy/app-crt/tls.crt /etc/caddy/app-crt/tls.key
 
       import afn_common
       
@@ -95,7 +89,7 @@ data:
     }
     
     {{ $context.Values.lb.admin.domain }} {
-      tls /etc/caddy/admin-crt/tls.crt /etc/caddy/admin-crt/tls.key
+      tls /etc/caddy/app-crt/tls.crt /etc/caddy/app-crt/tls.key
 
       import afn_common
       
@@ -103,6 +97,12 @@ data:
       file_server
     }
 
+    lb.{{ $context.Values.geoDomain }} {
+      tls /etc/caddy/lb-crt/tls.crt /etc/caddy/lb-crt/tls.key
+
+      import afn_webserver
+    }
+    
     ctrl-plane.{{ $context.Values.geoDomain }} {
       tls /etc/caddy/ctrl-plane-crt/tls.crt /etc/caddy/ctrl-plane-crt/tls.key
 

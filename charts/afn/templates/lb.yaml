@@ -108,15 +108,6 @@ spec:
             - name: app-crt
               mountPath: /etc/caddy/app-crt
               readOnly: true
-            - name: realtime-crt
-              mountPath: /etc/caddy/realtime-crt
-              readOnly: true
-            - name: pages-crt
-              mountPath: /etc/caddy/pages-crt
-              readOnly: true
-            - name: admin-crt
-              mountPath: /etc/caddy/admin-crt
-              readOnly: true
             - name: pages
               mountPath: /pages
             - name: admin
@@ -154,16 +145,7 @@ spec:
           secretName: lb-ctrl-plane-crt-secret
       - name: app-crt
         secret:
-          secretName: app-crt-secret-tmp
-      - name: realtime-crt
-        secret:
-          secretName: realtime-crt-secret-tmp
-      - name: pages-crt
-        secret:
-          secretName: pages-crt-secret-tmp
-      - name: admin-crt
-        secret:
-          secretName: admin-crt-secret-tmp
+          secretName: app-crt-secret
       - name: {{ .name }}-crt
         secret:
           secretName: {{ .name }}-crt-secret
@@ -336,32 +318,19 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: api-crt
+  name: app-crt
   namespace: {{ .Release.Namespace }}
 spec:
-  secretName: api-crt-secret
+  secretName: app-crt-secret
   dnsNames:
-  - api.anyfile-notepad.semaan.ca
+  - {{ $context.Values.lb.app.domain }}
+  - {{ $context.Values.lb.realtime.domain }}
+  - {{ $context.Values.lb.pages.domain }}
+  - {{ $context.Values.lb.admin.domain }}
+  - {{ $context.Values.lb.api.domain }}
   issuerRef:
-    name: selfsigned-cluster-issuer
+    name: letsencrypt-production
     # We can reference ClusterIssuers by changing the kind here.
     # The default value is Issuer (i.e. a locally namespaced Issuer)
     kind: ClusterIssuer
     group: cert-manager.io
-#---
-#apiVersion: cert-manager.io/v1
-#kind: Certificate
-#metadata:
-#  name: app-crt
-#  namespace: {{ .Release.Namespace }}
-#spec:
-#  secretName: lb-crt-secret
-#  dnsNames:
-#  - {{ $context.Values.lb.app.domain }}
-#  - {{ $context.Values.lb.realtime.domain }}
-#  issuerRef:
-#    name: letsencrypt-production
-#    # We can reference ClusterIssuers by changing the kind here.
-#    # The default value is Issuer (i.e. a locally namespaced Issuer)
-#    kind: ClusterIssuer
-#    group: cert-manager.io
