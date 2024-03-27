@@ -9,6 +9,8 @@ RUN git clone $GEODNS_REPO geodns
 
 WORKDIR geodns
 
+RUN git checkout $GEODNS_VERSION
+
 RUN make linux-build
 
 FROM ubuntu:22.04
