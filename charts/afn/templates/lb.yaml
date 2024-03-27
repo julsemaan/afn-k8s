@@ -93,9 +93,6 @@ spec:
             - name: caddyfile-config-volume
               mountPath: /etc/caddy/Caddyfile 
               subPath: caddyfile
-            - name: api-crt
-              mountPath: /etc/caddy/api-crt
-              readOnly: true
             - name: lb-crt
               mountPath: /etc/caddy/lb-crt
               readOnly: true
@@ -134,9 +131,6 @@ spec:
       - name: caddyfile-config-volume
         configMap:
           name: {{ include "afn.fullname" $context }}-caddyfile-{{ .name }}-{{ $context.Release.Revision }}
-      - name: api-crt
-        secret:
-          secretName: api-crt-secret
       - name: lb-crt
         secret:
           secretName: lb-crt-secret
