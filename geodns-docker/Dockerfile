@@ -27,3 +27,4 @@ COPY geodns.conf dns/
 
 ENTRYPOINT ["/geodns"]
 
+
