@@ -46,12 +46,31 @@ data:
       }
     }
 
+    (api_proxy) {
+      # Using svc.cluster.local to hit the 30 second TTL set in CoreDNS
+      reverse_proxy api-{{ include "afn.fullname" $context }}.{{ $context.Release.Namespace }}.svc.cluster.local:80 {
+        transport http {
+          resolvers 169.254.20.10
+        }
+      }
+    }
+
     (afn_webserver) {
       import afn_common
       import no_events_access
       import backend_proxy
     }
 
+    {{ $context.Values.lb.api.domain }} {
+      tls /etc/caddy/app-crt/tls.crt /etc/caddy/app-crt/tls.key
+
+      log {
+        format console
+      }
+
+      import api_proxy
+    }
+    
     {{ $context.Values.lb.app.domain }} {
       tls /etc/caddy/app-crt/tls.crt /etc/caddy/app-crt/tls.key
 

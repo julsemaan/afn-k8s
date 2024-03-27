@@ -30,8 +30,12 @@ lb:
   realtime:
     domain: realtime.DOMAIN_NAME
     region: null
+api:
+  image:
+    repository: ghcr.io/julsemaan/anyfile-notepad/api
+    tag: feat-deploy-afn-k8s
+    pullPolicy: IfNotPresent
 backend:
-  imagePullSecrets: []
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/webserver
     tag: 216cd7c0ce733666b1bf5e2e8e3eaacce458f782

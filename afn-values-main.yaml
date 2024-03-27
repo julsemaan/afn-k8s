@@ -60,3 +60,6 @@ lb:
 geodns:
   image:
     pullPolicy: Always
+
+api:
+  bucket: afn-main-3jdc8

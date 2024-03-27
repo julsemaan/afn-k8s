@@ -1,0 +1,321 @@
+{{ $context := . }}
+{{ $afnSecret := (lookup "v1" "Secret" $context.Release.Namespace "afn-secret") }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-s3cmd-config-{{ include "afn.fullname" $context }}
+data:
+  .s3cfg: |
+    [default]
+    access_key =
+    access_token =
+    add_encoding_exts =
+    add_headers =
+    bucket_location = US
+    ca_certs_file =
+    cache_file =
+    check_ssl_certificate = True
+    check_ssl_hostname = True
+    cloudfront_host = cloudfront.amazonaws.com
+    connection_max_age = 5
+    connection_pooling = True
+    content_disposition =
+    content_type =
+    default_mime_type = binary/octet-stream
+    delay_updates = False
+    delete_after = False
+    delete_after_fetch = False
+    delete_removed = False
+    dry_run = False
+    enable_multipart = True
+    encoding = UTF-8
+    encrypt = False
+    expiry_date =
+    expiry_days =
+    expiry_prefix =
+    follow_symlinks = False
+    force = False
+    get_continue = False
+    gpg_command = /usr/bin/gpg
+    gpg_decrypt = %(gpg_command)s -d --verbose --no-use-agent --batch --yes --passphrase-fd %(passphrase_fd)s -o %(output_file)s %(input_file)s
+    gpg_encrypt = %(gpg_command)s -c --verbose --no-use-agent --batch --yes --passphrase-fd %(passphrase_fd)s -o %(output_file)s %(input_file)s
+    gpg_passphrase =
+    guess_mime_type = True
+    host_base = us-ord-1.linodeobjects.com
+    host_bucket = %(bucket).us-ord-1.linodeobjects.com
+    human_readable_sizes = False
+    invalidate_default_index_on_cf = False
+    invalidate_default_index_root_on_cf = True
+    invalidate_on_cf = False
+    kms_key =
+    limit = -1
+    limitrate = 0
+    list_md5 = False
+    log_target_prefix =
+    long_listing = False
+    max_delete = -1
+    mime_type =
+    multipart_chunk_size_mb = 15
+    multipart_copy_chunk_size_mb = 1024
+    multipart_max_chunks = 10000
+    preserve_attrs = True
+    progress_meter = True
+    proxy_host =
+    proxy_port = 0
+    public_url_use_https = False
+    put_continue = False
+    recursive = False
+    recv_chunk = 65536
+    reduced_redundancy = False
+    requester_pays = False
+    restore_days = 1
+    restore_priority = Standard
+    secret_key =
+    send_chunk = 65536
+    server_side_encryption = False
+    signature_v2 = False
+    signurl_use_https = False
+    simpledb_host = sdb.amazonaws.com
+    skip_existing = False
+    socket_timeout = 300
+    ssl_client_cert_file =
+    ssl_client_key_file =
+    stats = False
+    stop_on_error = False
+    storage_class =
+    throttle_max = 100
+    upload_id =
+    urlencoding_mode = normal
+    use_http_expect = False
+    use_https = True
+    use_mime_magic = True
+    verbosity = WARNING
+    website_endpoint = http://%(bucket)s.s3-website-%(location)s.amazonaws.com/
+    website_error =
+    website_index = index.html
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: api-{{ include "afn.fullname" $context }}
+  namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.labels" $context | nindent 4 }}
+    app: api
+  annotations:
+    secret.reloader.stakater.com/reload: "afn-secret"
+spec:
+  selector:
+    matchLabels:
+      {{- include "afn.selectorLabels" $context | nindent 6 }}
+  template:
+    metadata:
+      {{- with $context.Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "afn.selectorLabels" $context | nindent 8 }}
+        app: api
+    spec:
+      {{- with $context.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "afn.serviceAccountName" $context }}
+      securityContext:
+        {{- toYaml $context.Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: dbs
+          emptyDir: {}
+        - name: s3cmd-config
+          configMap:
+            name: api-s3cmd-config-{{ include "afn.fullname" $context }}
+      initContainers:
+        - name: sync-obj
+          image: ubuntu:22.04
+          command:
+            - bash
+          args:
+            - -c
+            - |
+              set -o nounset -o pipefail -o errexit
+              apt update && apt install s3cmd ca-certificates -y
+              s3cmd --access_key=$OBJ_ACCESS_KEY --secret_key=$OBJ_SECRET_KEY sync s3://$BUCKET/dbs /dbs
+          volumeMounts:
+            - name: dbs
+              mountPath: /dbs
+            - name: s3cmd-config
+              mountPath: /root/.s3cfg
+              subPath: .s3cfg
+          env:
+            - name: OBJ_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: afn-secret
+                  key: OBJ_ACCESS_KEY
+            - name: OBJ_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: afn-secret
+                  key: OBJ_SECRET_KEY
+            - name: BUCKET
+              value: {{ $context.Values.api.bucket }}
+            - name: WATCH_DIR
+              value: /dbs
+
+      containers:
+        - name: {{ $context.Chart.Name }}
+          securityContext:
+            {{- toYaml $context.Values.securityContext | nindent 12 }}
+          image: "{{ $context.Values.api.image.repository }}:{{ $context.Values.api.image.tag | default $context.Chart.AppVersion }}"
+          imagePullPolicy: {{ $context.Values.api.image.pullPolicy }}
+          ports:
+            - name: listen-port
+              containerPort: 8080
+          #livenessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: listen-port
+          #readinessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: listen-port
+          resources:
+            {{- toYaml $context.Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: dbs
+              mountPath: /dbs
+          env:
+            - name: AFN_REST_DATA_DIR
+              value: /dbs/dbs
+          {{ range $k, $v := $afnSecret.data }}
+            - name: {{ $k }}
+              valueFrom:
+                secretKeyRef:
+                  name: afn-secret
+                  key: {{ $k }}
+          {{- end }}
+        - name: while-put-obj
+          image: ubuntu:22.04
+          command:
+            - bash
+          args:
+            - -c
+            - |
+              set -o nounset -o pipefail -o errexit
+
+              if ! which s3cmd || ! which inotifywait; then
+                apt update && apt install s3cmd ca-certificates inotify-tools -y
+              fi
+
+              cd $WATCH_DIR
+
+              while true; do
+                echo "Syncing to $BUCKET"
+                s3cmd --no-preserve --access_key=$OBJ_ACCESS_KEY --secret_key=$OBJ_SECRET_KEY sync ./ s3://$BUCKET
+                sleep $INTERVAL
+              done
+
+          volumeMounts:
+            - name: dbs
+              mountPath: /dbs
+            - name: s3cmd-config
+              mountPath: /root/.s3cfg
+              subPath: .s3cfg
+          env:
+            - name: OBJ_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: afn-secret
+                  key: OBJ_ACCESS_KEY
+            - name: OBJ_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: afn-secret
+                  key: OBJ_SECRET_KEY
+            - name: BUCKET
+              value: {{ $context.Values.api.bucket }}
+            - name: INTERVAL
+              value: "300"
+            - name: WATCH_DIR
+              value: /dbs
+        - name: inotify-put-obj
+          image: ubuntu:22.04
+          command:
+            - bash
+          args:
+            - -c
+            - |
+              set -o nounset -o pipefail -o errexit
+
+              if ! which s3cmd || ! which inotifywait; then
+                apt update && apt install s3cmd ca-certificates inotify-tools -y
+              fi
+
+              cd $WATCH_DIR
+
+              inotifywait \
+                --monitor \
+                --recursive \
+                -e create -e modify . \
+                --timefmt '%Y-%m-%dT%H:%M:%S' \
+                --format '%T %w %f %e' \
+              | while read datetime dir filename event; do
+                echo "At $datetime $dir$filename changed $event"
+                echo "Now, we could use $datetime $dir $filename $event and pass them to some other command, too! e.g."
+
+                dir=$(echo -n $dir | sed 's|^./||')
+
+                echo "changed $dir$filename"
+                [ -f $dir$filename ] && s3cmd --access_key=$OBJ_ACCESS_KEY --secret_key=$OBJ_SECRET_KEY put $dir$filename s3://$BUCKET/$dir$filename
+              done
+
+          volumeMounts:
+            - name: dbs
+              mountPath: /dbs
+            - name: s3cmd-config
+              mountPath: /root/.s3cfg
+              subPath: .s3cfg
+          env:
+            - name: OBJ_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: afn-secret
+                  key: OBJ_ACCESS_KEY
+            - name: OBJ_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: afn-secret
+                  key: OBJ_SECRET_KEY
+            - name: BUCKET
+              value: {{ $context.Values.api.bucket }}
+            - name: WATCH_DIR
+              value: /dbs
+      {{- with .nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $context.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $context.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-{{ include "afn.fullname" $context }}
+  namespace: {{ $context.Release.Namespace }}
+spec:
+  selector:
+    app: api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
