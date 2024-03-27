@@ -20,4 +20,8 @@ linodes:
     region: us-mia
     instanceType: g6-nanode-1
     typeTag: test-workerNode
+  srv-mil-1:
+    region: it-mil
+    instanceType: g6-nanode-1
+    typeTag: test-workerNode
 
