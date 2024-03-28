@@ -34,7 +34,7 @@ jobs:
         with:
           context: geodns-docker/
           push: true
-          tags: julsemaan/afn-k8s/geodns:${{ env.IMG_TAG }}
+          tags: ghcr.io/julsemaan/afn-k8s/geodns:${{ env.IMG_TAG }}
 
   pr_afn_k8s:
     concurrency:
