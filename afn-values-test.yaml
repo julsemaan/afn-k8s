@@ -41,4 +41,4 @@ lb:
 geodns:
   image:
     pullPolicy: Always
-    tag: e6088a020940a6d34340db55e3c10a2135e3dfc4
+    tag: ccd78f7d0a18ab0b16a8c0e3c4747c3826a5a7eb
