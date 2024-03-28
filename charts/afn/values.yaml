@@ -95,3 +95,7 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 #test
+
+rsyslog:
+  image:
+    tag: 1c2ea7e4fff75d3dd1c13bdfd5520bfd8176fa92
