@@ -21,7 +21,7 @@ RUN mkdir -p dns
 
 RUN mkdir -p /usr/share/GeoIP/
 
-COPY --chown=root GeoLite2-Country.mmdb /usr/share/GeoIP/
+COPY --chown=root:root GeoLite2-Country.mmdb /usr/share/GeoIP/
 
 COPY geodns.conf dns/
 
