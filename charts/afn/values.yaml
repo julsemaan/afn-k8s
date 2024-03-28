@@ -54,7 +54,7 @@ geodns:
     repository: julsemaan/geodns
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0e2f8fa2c85b2279398de87f782487b81cdd005c"
+    tag: "2a94894b759c5d062554aedef3f4dd4b8d64a465"
 controlRegion: {}
 regions: []
 nameOverride: ""
