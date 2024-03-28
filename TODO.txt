@@ -12,7 +12,7 @@ X Add API with backed by OBJ to the chart
   X Handle race condition if API starts before inotify is looking
   X Periodic upload of all DBs to OBJ
 - Build geodns via GHA and use auto-PR workflow
-- Build API via GHA and use auto-PR workflow
+X Build API via GHA and use auto-PR workflow
 - Automate periodic builds of rsyslog image
 - Debounce SUBMIT on contact form
 - Have API statefulset have affinity to ORD or GRU or other lower latency places
@@ -27,5 +27,3 @@ X Install linode api secrets via GHA
 - Have a monitoring job for node-local-dns that sends metrics to prometheus
   watch bash -c "time dig kube-dns.kube-system.svc.cluster.local"'
 
-- Implement auto-detection of dark mode
-- Use JWT instead of session ID for afn-pp session (no need to sync sessions after)
