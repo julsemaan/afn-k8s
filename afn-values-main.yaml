@@ -60,7 +60,7 @@ lb:
 geodns:
   image:
     repository: julsemaan/geodns
-    tag: test
+    tag: test2
     pullPolicy: Always
 
 api:

@@ -41,4 +41,3 @@ lb:
 geodns:
   image:
     pullPolicy: Always
-    tag: test
