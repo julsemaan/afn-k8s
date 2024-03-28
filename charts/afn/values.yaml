@@ -54,7 +54,7 @@ geodns:
     repository: ghcr.io/julsemaan/afn-k8s/geodns
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "e6088a020940a6d34340db55e3c10a2135e3dfc4"
+    tag: "ccd78f7d0a18ab0b16a8c0e3c4747c3826a5a7eb"
 rsyslog:
   imagePullSecrets: []
   image:
