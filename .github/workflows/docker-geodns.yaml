@@ -2,7 +2,7 @@ name: Docker Image geodns
 
 on:
   push:
-    branches: ['main']
+    branches: ['**']
     paths:
       - 'geodns-docker/**'
       - '.github/workflows/docker-geodns.yaml'
