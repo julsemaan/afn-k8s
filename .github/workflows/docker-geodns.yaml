@@ -1,4 +1,4 @@
-name: Docker Image admin
+name: Docker Image geodns
 
 on:
   push:
@@ -43,7 +43,7 @@ jobs:
       group: prs-to-afn-k8s
       cancel-in-progress: false
     needs: docker
-    if: github.ref == 'refs/heads/main'
+    #if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
