@@ -1,7 +1,7 @@
 FROM golang:1.22.1-bookworm
 
 ARG GEODNS_REPO=https://github.com/abh/geodns
-ARG GEODNS_VERSION=v3.3.3
+ARG GEODNS_VERSION=904b19f90ca840cbb1e895d5805f80a8a2580c27
 
 WORKDIR /build
 
