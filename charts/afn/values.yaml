@@ -51,10 +51,10 @@ backend:
 geodns:
   imagePullSecrets: []
   image:
-    repository: julsemaan/geodns
+    repository: ghcr.io/julsemaan/afn-k8s/geodns
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "latest"
+    tag: "0e2f8fa2c85b2279398de87f782487b81cdd005c"
 controlRegion: {}
 regions: []
 nameOverride: ""
