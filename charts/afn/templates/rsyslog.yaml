@@ -15,6 +15,10 @@ spec:
       labels:
         app: rsyslog
     spec:
+      {{- with $context.Values.geodns.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -24,8 +28,8 @@ spec:
                   operator: Exists
       containers:
       - name: rsyslog
-        image: julsemaan/rsyslog
-        imagePullPolicy: Always
+        image: "{{ $context.Values.rsyslog.image.repository }}:{{ $context.Values.rsyslog.image.tag | default $context.Chart.AppVersion }}"
+        imagePullPolicy: {{ $context.Values.rsyslog.image.pullPolicy }}
         securityContext:
           runAsUser: 0
         ports:
