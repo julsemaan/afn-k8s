@@ -23,6 +23,8 @@ RUN mkdir -p /usr/share/GeoIP/
 
 COPY GeoLite2-Country.mmdb /usr/share/GeoIP/
 
+RUN chown root:root /usr/share/GeoIP/GeoLite2-Country.mmdb
+
 COPY geodns.conf dns/
 
 ENTRYPOINT ["/geodns"]
