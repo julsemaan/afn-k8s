@@ -5,7 +5,7 @@
 geoDomain: DOMAIN_NAME
 dnsRegions: []
 lb:
-  imagePullSecrets: []
+  name: lb
   image:
     repository: caddy
     pullPolicy: IfNotPresent
@@ -30,12 +30,29 @@ lb:
   realtime:
     domain: realtime.DOMAIN_NAME
     region: null
+  imagePullSecrets: []
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  resources: {}
+  tolerations: []
+  affinity: {}
 api:
+  name: api
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/api
     tag: b13e4aec2f0c3f0b1688397705ce92acd5e5b61a
     pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
 backend:
+  name: backend
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/webserver
     tag: 216cd7c0ce733666b1bf5e2e8e3eaacce458f782
@@ -49,6 +66,7 @@ backend:
     tag: 216cd7c0ce733666b1bf5e2e8e3eaacce458f782
     pullPolicy: IfNotPresent
 geodns:
+  name: geodns
   imagePullSecrets: []
   image:
     repository: ghcr.io/julsemaan/afn-k8s/geodns
@@ -56,6 +74,7 @@ geodns:
     # Overrides the image tag whose default is the chart appVersion.
     tag: "ca7a11c00eedb01a807bcc53efa55823e9990bb5"
 rsyslog:
+  name: rsyslog
   imagePullSecrets: []
   image:
     repository: ghcr.io/julsemaan/afn-k8s/rsyslog
@@ -74,31 +93,5 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-podAnnotations: {}
-podSecurityContext: {}
-# fsGroup: 2000
 
-securityContext: {}
-# capabilities:
-#   drop:
-#   - ALL
-# readOnlyRootFilesystem: true
-# runAsNonRoot: true
-# runAsUser: 1000
-
-resources: {}
-# We usually recommend not to specify default resources and to leave this as a conscious
-# choice for the user. This also increases chances charts run on environments with little
-# resources, such as Minikube. If you do want to specify resources, uncomment the following
-# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-# limits:
-#   cpu: 100m
-#   memory: 128Mi
-# requests:
-#   cpu: 100m
-#   memory: 128Mi
-
-nodeSelector: {}
-tolerations: []
-affinity: {}
 #test

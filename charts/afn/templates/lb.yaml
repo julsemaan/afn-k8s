@@ -1,4 +1,4 @@
-{{ $context := . }}
+{{ $context := merge (dict "appName" "lb") . }}
 {{ range .Values.regions }}
 ---
 apiVersion: apps/v1
@@ -14,17 +14,16 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "afn.selectorLabels" $context | nindent 6 }}
+      {{- include "afn.app-selectorLabels" $context | nindent 6 }}
       app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
   template:
     metadata:
-      {{- with $context.Values.podAnnotations }}
+      {{- with $context.Values.lb.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "afn.selectorLabels" $context | nindent 8 }}
-        app: lb
+        {{- include "afn.app-selectorLabels" $context | nindent 8 }}
         app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
     spec:
       dnsConfig:
@@ -41,9 +40,11 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "afn.serviceAccountName" $context }}
       securityContext:
-        {{- toYaml $context.Values.podSecurityContext | nindent 8 }}
+        {{- toYaml $context.Values.lb.podSecurityContext | nindent 8 }}
       initContainers:
         - name: setup-pages
+          securityContext:
+            {{- toYaml $context.Values.lb.securityContext | nindent 12 }}
           image: "{{ $context.Values.lb.pages.image.repository }}:{{ $context.Values.lb.pages.image.tag | default $context.Chart.AppVersion }}"
           imagePullPolicy: {{ $context.Values.lb.pages.image.pullPolicy }}
           command: [ sh ]
@@ -55,6 +56,8 @@ spec:
             - name: pages
               mountPath: /pages
         - name: setup-admin
+          securityContext:
+            {{- toYaml $context.Values.lb.securityContext | nindent 12 }}
           image: "{{ $context.Values.lb.admin.image.repository }}:{{ $context.Values.lb.admin.image.tag | default $context.Chart.AppVersion }}"
           imagePullPolicy: {{ $context.Values.lb.admin.image.pullPolicy }}
           command: [ sh ]
@@ -68,7 +71,7 @@ spec:
       containers:
         - name: {{ $context.Chart.Name }}
           securityContext:
-            {{- toYaml $context.Values.securityContext | nindent 12 }}
+            {{- toYaml $context.Values.lb.securityContext | nindent 12 }}
           image: "{{ $context.Values.lb.image.repository }}:{{ $context.Values.lb.image.tag | default $context.Chart.AppVersion }}"
           imagePullPolicy: {{ $context.Values.lb.image.pullPolicy }}
           ports:
@@ -110,16 +113,16 @@ spec:
             - name: admin
               mountPath: /admin
           resources:
-            {{- toYaml $context.Values.resources | nindent 12 }}
+            {{- toYaml $context.Values.lb.resources | nindent 12 }}
       {{- with .nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.affinity }}
+      {{- with $context.Values.lb.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.tolerations }}
+      {{- with $context.Values.lb.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -191,7 +194,7 @@ spec:
     name: external
   clusterIP: None
   selector:
-    app: lb
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
 ---
 apiVersion: v1
 kind: Service
@@ -207,7 +210,7 @@ spec:
     name: external
   clusterIP: None
   selector:
-    app: lb
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
 ---
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
