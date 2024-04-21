@@ -7,15 +7,15 @@ metadata:
   name: lb-{{ include "afn.fullname" $context }}-{{ .name }}
   namespace: {{ $context.Release.Namespace }}
   labels:
-    {{- include "afn.labels" $context | nindent 4 }}
-    app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+    {{- include "afn.app-labels" $context | nindent 4 }}
+    app.kubernetes.io/region: {{ .name }}
   annotations:
     secret.reloader.stakater.com/reload: "lb-crt-secret,lb-ctrl-plane-crt-secret,{{ .name }}-crt-secret"
 spec:
   selector:
     matchLabels:
       {{- include "afn.app-selectorLabels" $context | nindent 6 }}
-      app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+      app.kubernetes.io/region: {{ .name }}
   template:
     metadata:
       {{- with $context.Values.lb.podAnnotations }}
@@ -24,7 +24,7 @@ spec:
       {{- end }}
       labels:
         {{- include "afn.app-selectorLabels" $context | nindent 8 }}
-        app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+        app.kubernetes.io/region: {{ .name }}
     spec:
       dnsConfig:
         options:
@@ -152,6 +152,8 @@ kind: Service
 metadata:
   name: lb-{{ .name }}
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
     external-dns.alpha.kubernetes.io/hostname: {{ .name }}.{{ $context.Values.geoDomain }}
     external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
@@ -161,13 +163,16 @@ spec:
     name: external
   clusterIP: None
   selector:
-    app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
+    app.kubernetes.io/region: {{ .name }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ .name }}-crt
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   secretName: {{ .name }}-crt-secret
   dnsNames:
@@ -185,6 +190,8 @@ kind: Service
 metadata:
   name: lb
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
     external-dns.alpha.kubernetes.io/hostname: lb.{{ $context.Values.geoDomain }}
     external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
@@ -201,6 +208,8 @@ kind: Service
 metadata:
   name: lb-ctrl-plane
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
     external-dns.alpha.kubernetes.io/hostname: ctrl-plane.{{ $context.Values.geoDomain }}
     external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
@@ -217,6 +226,8 @@ kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-app-cname
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: {{ $context.Values.lb.app.domain }}
@@ -230,6 +241,8 @@ kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-realtime-cname
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: {{ $context.Values.lb.realtime.domain }}
@@ -247,6 +260,8 @@ kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-api-cname
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: {{ $context.Values.lb.api.domain }}
@@ -259,6 +274,8 @@ kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-pages-cname
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: {{ $context.Values.lb.pages.domain }}
@@ -271,6 +288,8 @@ kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-admin-cname
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: {{ $context.Values.lb.admin.domain }}
@@ -283,6 +302,8 @@ kind: Certificate
 metadata:
   name: lb-crt
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   secretName: lb-crt-secret
   dnsNames:
@@ -299,6 +320,8 @@ kind: Certificate
 metadata:
   name: lb-ctrl-plane-crt
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   secretName: lb-ctrl-plane-crt-secret
   dnsNames:
@@ -315,6 +338,8 @@ kind: Certificate
 metadata:
   name: app-crt
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   secretName: app-crt-secret
   dnsNames:
