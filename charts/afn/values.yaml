@@ -5,7 +5,6 @@
 geoDomain: DOMAIN_NAME
 dnsRegions: []
 lb:
-  name: lb
   image:
     repository: caddy
     pullPolicy: IfNotPresent
@@ -38,7 +37,6 @@ lb:
   tolerations: []
   affinity: {}
 api:
-  name: api
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/api
     tag: b13e4aec2f0c3f0b1688397705ce92acd5e5b61a
@@ -52,7 +50,6 @@ api:
   tolerations: []
   affinity: {}
 backend:
-  name: backend
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/webserver
     tag: 216cd7c0ce733666b1bf5e2e8e3eaacce458f782
@@ -66,13 +63,20 @@ backend:
     tag: 216cd7c0ce733666b1bf5e2e8e3eaacce458f782
     pullPolicy: IfNotPresent
 geodns:
-  name: geodns
   imagePullSecrets: []
   image:
     repository: ghcr.io/julsemaan/afn-k8s/geodns
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "ca7a11c00eedb01a807bcc53efa55823e9990bb5"
+  imagePullSecrets: []
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
 rsyslog:
   name: rsyslog
   imagePullSecrets: []

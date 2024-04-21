@@ -1,4 +1,4 @@
-{{ $context := . }}
+{{ $context := merge (dict "appName" "geodns") . }}
 {{ range .Values.regions }}
 ---
 apiVersion: apps/v1
@@ -12,17 +12,16 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "afn.selectorLabels" $context | nindent 6 }}
+      {{- include "afn.app-selectorLabels" $context | nindent 6 }}
       app.region: geodns-{{ include "afn.fullname" $context }}-{{ .name }}
   template:
     metadata:
-      {{- with $context.Values.podAnnotations }}
+      {{- with $context.Values.geodns.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "afn.selectorLabels" $context | nindent 8 }}
-        app: geodns
+        {{- include "afn.app-selectorLabels" $context | nindent 8 }}
         app.region: geodns-{{ include "afn.fullname" $context }}-{{ .name }}
     spec:
       hostNetwork: true
@@ -32,15 +31,15 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "afn.serviceAccountName" $context }}
       securityContext:
-        {{- toYaml $context.Values.podSecurityContext | nindent 8 }}
+        {{- toYaml $context.Values.geodns.podSecurityContext | nindent 8 }}
       containers:
         - name: geodns
           securityContext:
-            {{- toYaml $context.Values.securityContext | nindent 12 }}
+            {{- toYaml $context.Values.geodns.securityContext | nindent 12 }}
           image: "{{ $context.Values.geodns.image.repository }}:{{ $context.Values.geodns.image.tag | default $context.Chart.AppVersion }}"
           imagePullPolicy: {{ $context.Values.geodns.image.pullPolicy }}
           resources:
-            {{- toYaml $context.Values.resources | nindent 12 }}
+            {{- toYaml $context.Values.geodns.resources | nindent 12 }}
           volumeMounts:
             - name: geodns-config-volume
               mountPath: ./dns/
@@ -48,11 +47,11 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.affinity }}
+      {{- with $context.Values.geodns.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.tolerations }}
+      {{- with $context.Values.geodns.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -100,7 +99,7 @@ spec:
     name: external
   clusterIP: None
   selector:
-    app: geodns
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
 
 ---
 apiVersion: v1
