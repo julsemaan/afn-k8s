@@ -293,7 +293,7 @@ spec:
               value: {{ $context.Values.api.bucket }}
             - name: WATCH_DIR
               value: /dbs
-      {{- with .nodeSelector }}
+      {{- with $context.Values.api.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}

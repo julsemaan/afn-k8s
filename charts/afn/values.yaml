@@ -85,6 +85,22 @@ rsyslog:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "1c2ea7e4fff75d3dd1c13bdfd5520bfd8176fa92"
+  imagePullSecrets: []
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: 
+    runAsUser: 0
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+
 controlRegion: {}
 regions: []
 nameOverride: ""
