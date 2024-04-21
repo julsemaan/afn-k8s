@@ -37,6 +37,8 @@ spec:
       serviceAccountName: {{ include "afn.serviceAccountName" $context }}
       containers:
       - name: rsyslog
+        securityContext:
+          {{- toYaml $context.Values.rsyslog.securityContext | nindent 10 }}
         image: "{{ .Values.rsyslog.image.repository }}:{{ .Values.rsyslog.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.rsyslog.image.pullPolicy }}
         ports:
