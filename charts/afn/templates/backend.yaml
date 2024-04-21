@@ -1,4 +1,4 @@
-{{ $context := . }}
+{{ $context := merge (dict "appName" "backend") . }}
 {{ $afnSecret := (lookup "v1" "Secret" $context.Release.Namespace "afn-secret") }}
 {{ range .Values.regions }}
 ---
@@ -8,15 +8,15 @@ metadata:
   name: backend-{{ include "afn.fullname" $context }}-{{ .name }}
   namespace: {{ $context.Release.Namespace }}
   labels:
-    {{- include "afn.labels" $context | nindent 4 }}
-    app: backend
-    app.region: backend-{{ include "afn.fullname" $context }}-{{ .name }}
+    {{- include "afn.app-labels" $context | nindent 4 }}
+    app.kubernetes.io/region: {{ .name }}
   annotations:
     secret.reloader.stakater.com/reload: "afn-secret"
 spec:
   selector:
     matchLabels:
-      {{- include "afn.selectorLabels" $context | nindent 6 }}
+      {{- include "afn.app-selectorLabels" $context | nindent 6 }}
+      app.kubernetes.io/region: {{ .name }}
   template:
     metadata:
       {{- with $context.Values.podAnnotations }}
@@ -24,9 +24,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "afn.selectorLabels" $context | nindent 8 }}
-        app: backend
-        app.region: backend-{{ include "afn.fullname" $context }}-{{ .name }}
+        {{- include "afn.app-selectorLabels" $context | nindent 8 }}
+        app.kubernetes.io/region: {{ .name }}
     spec:
       dnsConfig:
         options:
@@ -36,13 +35,13 @@ spec:
           value: "2"
         - name: timeout
           value: "1"
-      {{- with $context.Values.imagePullSecrets }}
+      {{- with $context.Values.backend.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "afn.serviceAccountName" $context }}
       securityContext:
-        {{- toYaml $context.Values.podSecurityContext | nindent 8 }}
+        {{- toYaml $context.Values.backend.podSecurityContext | nindent 8 }}
       volumes:
         - name: persistent
           hostPath:
@@ -78,7 +77,7 @@ spec:
       containers:
         - name: {{ $context.Chart.Name }}
           securityContext:
-            {{- toYaml $context.Values.securityContext | nindent 12 }}
+            {{- toYaml $context.Values.backend.securityContext | nindent 12 }}
           image: "{{ $context.Values.backend.image.repository }}:{{ $context.Values.backend.image.tag | default $context.Chart.AppVersion }}"
           imagePullPolicy: {{ $context.Values.backend.image.pullPolicy }}
           ports:
@@ -93,7 +92,7 @@ spec:
               path: /
               port: listen-port
           resources:
-            {{- toYaml $context.Values.resources | nindent 12 }}
+            {{- toYaml $context.Values.backend.resources | nindent 12 }}
           volumeMounts:
             - name: prod-app
               mountPath: /prod-app
@@ -120,11 +119,11 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.affinity }}
+      {{- with $context.Values.backend.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.tolerations }}
+      {{- with $context.Values.backend.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -134,9 +133,13 @@ kind: Service
 metadata:
   name: backend-{{ include "afn.fullname" $context }}-{{ .name }}
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
+    app.kubernetes.io/region: {{ .name }}
 spec:
   selector:
-    app.region: backend-{{ include "afn.fullname" $context }}-{{ .name }}
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
+    app.kubernetes.io/region: {{ .name }}
   ports:
     - protocol: TCP
       port: 80
