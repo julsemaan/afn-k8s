@@ -1,10 +1,12 @@
-{{ $context := . }}
+{{ $context := merge (dict "appName" "api") . }}
 {{ $afnSecret := (lookup "v1" "Secret" $context.Release.Namespace "afn-secret") }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: api-s3cmd-config-{{ include "afn.fullname" $context }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 data:
   .s3cfg: |
     [default]
@@ -102,32 +104,30 @@ metadata:
   name: api-{{ include "afn.fullname" $context }}
   namespace: {{ $context.Release.Namespace }}
   labels:
-    {{- include "afn.labels" $context | nindent 4 }}
-    app: api
+    {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
     secret.reloader.stakater.com/reload: "afn-secret"
 spec:
   selector:
     matchLabels:
-      {{- include "afn.selectorLabels" $context | nindent 6 }}
+      {{- include "afn.app-selectorLabels" $context | nindent 6 }}
   serviceName: api
   template:
     metadata:
-      {{- with $context.Values.podAnnotations }}
+      {{- with $context.Values.api.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "afn.selectorLabels" $context | nindent 8 }}
-        app: api
+        {{- include "afn.app-selectorLabels" $context | nindent 8 }}
     spec:
-      {{- with $context.Values.imagePullSecrets }}
+      {{- with $context.Values.api.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "afn.serviceAccountName" $context }}
       securityContext:
-        {{- toYaml $context.Values.podSecurityContext | nindent 8 }}
+        {{- toYaml $context.Values.api.podSecurityContext | nindent 8 }}
       volumes:
         - name: dbs
           emptyDir: {}
@@ -170,7 +170,7 @@ spec:
       containers:
         - name: {{ $context.Chart.Name }}
           securityContext:
-            {{- toYaml $context.Values.securityContext | nindent 12 }}
+            {{- toYaml $context.Values.api.securityContext | nindent 12 }}
           image: "{{ $context.Values.api.image.repository }}:{{ $context.Values.api.image.tag | default $context.Chart.AppVersion }}"
           imagePullPolicy: {{ $context.Values.api.image.pullPolicy }}
           ports:
@@ -185,7 +185,7 @@ spec:
           #    path: /
           #    port: listen-port
           resources:
-            {{- toYaml $context.Values.resources | nindent 12 }}
+            {{- toYaml $context.Values.api.resources | nindent 12 }}
           volumeMounts:
             - name: dbs
               mountPath: /dbs
@@ -295,15 +295,15 @@ spec:
               value: {{ $context.Values.api.bucket }}
             - name: WATCH_DIR
               value: /dbs
-      {{- with .nodeSelector }}
+      {{- with $context.Values.api.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.affinity }}
+      {{- with $context.Values.api.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.tolerations }}
+      {{- with $context.Values.api.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -313,9 +313,11 @@ kind: Service
 metadata:
   name: api-{{ include "afn.fullname" $context }}
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   selector:
-    app: api
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
   ports:
     - protocol: TCP
       port: 80

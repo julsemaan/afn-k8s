@@ -5,7 +5,6 @@
 geoDomain: DOMAIN_NAME
 dnsRegions: []
 lb:
-  imagePullSecrets: []
   image:
     repository: caddy
     pullPolicy: IfNotPresent
@@ -30,11 +29,26 @@ lb:
   realtime:
     domain: realtime.DOMAIN_NAME
     region: null
+  imagePullSecrets: []
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  resources: {}
+  tolerations: []
+  affinity: {}
 api:
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/api
     tag: b13e4aec2f0c3f0b1688397705ce92acd5e5b61a
     pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
 backend:
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/webserver
@@ -55,13 +69,38 @@ geodns:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "ca7a11c00eedb01a807bcc53efa55823e9990bb5"
+  imagePullSecrets: []
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
 rsyslog:
+  name: rsyslog
   imagePullSecrets: []
   image:
     repository: ghcr.io/julsemaan/afn-k8s/rsyslog
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "1c2ea7e4fff75d3dd1c13bdfd5520bfd8176fa92"
+  imagePullSecrets: []
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: 
+    runAsUser: 0
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+
 controlRegion: {}
 regions: []
 nameOverride: ""
@@ -74,31 +113,4 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-podAnnotations: {}
-podSecurityContext: {}
-# fsGroup: 2000
 
-securityContext: {}
-# capabilities:
-#   drop:
-#   - ALL
-# readOnlyRootFilesystem: true
-# runAsNonRoot: true
-# runAsUser: 1000
-
-resources: {}
-# We usually recommend not to specify default resources and to leave this as a conscious
-# choice for the user. This also increases chances charts run on environments with little
-# resources, such as Minikube. If you do want to specify resources, uncomment the following
-# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-# limits:
-#   cpu: 100m
-#   memory: 128Mi
-# requests:
-#   cpu: 100m
-#   memory: 128Mi
-
-nodeSelector: {}
-tolerations: []
-affinity: {}
-#test

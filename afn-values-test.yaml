@@ -26,6 +26,7 @@ dnsRegions:
 api:
   bucket: afn-test-23d9g
 
+
 lb:
   app:
     domain: lb-app.v3geo-test.semaan.ca

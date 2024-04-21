@@ -1,4 +1,4 @@
-{{ $context := . }}
+{{ $context := merge (dict "appName" "geodns") . }}
 {{ range .Values.regions }}
 ---
 apiVersion: apps/v1
@@ -7,23 +7,22 @@ metadata:
   name: geodns-{{ include "afn.fullname" $context }}-{{ .name }}
   namespace: {{ $context.Release.Namespace }}
   labels:
-    {{- include "afn.labels" $context | nindent 4 }}
-    app.region: geodns-{{ include "afn.fullname" $context }}-{{ .name }}
+    {{- include "afn.app-labels" $context | nindent 4 }}
+    app.kubernetes.io/region: {{ .name }}
 spec:
   selector:
     matchLabels:
-      {{- include "afn.selectorLabels" $context | nindent 6 }}
-      app.region: geodns-{{ include "afn.fullname" $context }}-{{ .name }}
+      {{- include "afn.app-selectorLabels" $context | nindent 6 }}
+      app.kubernetes.io/region: {{ .name }}
   template:
     metadata:
-      {{- with $context.Values.podAnnotations }}
+      {{- with $context.Values.geodns.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "afn.selectorLabels" $context | nindent 8 }}
-        app: geodns
-        app.region: geodns-{{ include "afn.fullname" $context }}-{{ .name }}
+        {{- include "afn.app-selectorLabels" $context | nindent 8 }}
+        app.kubernetes.io/region: {{ .name }}
     spec:
       hostNetwork: true
       {{- with $context.Values.geodns.imagePullSecrets }}
@@ -32,15 +31,15 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "afn.serviceAccountName" $context }}
       securityContext:
-        {{- toYaml $context.Values.podSecurityContext | nindent 8 }}
+        {{- toYaml $context.Values.geodns.podSecurityContext | nindent 8 }}
       containers:
         - name: geodns
           securityContext:
-            {{- toYaml $context.Values.securityContext | nindent 12 }}
+            {{- toYaml $context.Values.geodns.securityContext | nindent 12 }}
           image: "{{ $context.Values.geodns.image.repository }}:{{ $context.Values.geodns.image.tag | default $context.Chart.AppVersion }}"
           imagePullPolicy: {{ $context.Values.geodns.image.pullPolicy }}
           resources:
-            {{- toYaml $context.Values.resources | nindent 12 }}
+            {{- toYaml $context.Values.geodns.resources | nindent 12 }}
           volumeMounts:
             - name: geodns-config-volume
               mountPath: ./dns/
@@ -48,11 +47,11 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.affinity }}
+      {{- with $context.Values.geodns.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.tolerations }}
+      {{- with $context.Values.geodns.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -91,6 +90,8 @@ kind: Service
 metadata:
   name: geodns
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
     external-dns.alpha.kubernetes.io/hostname: geodns.{{ $context.Values.geoDomain }}
     external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
@@ -100,7 +101,7 @@ spec:
     name: external
   clusterIP: None
   selector:
-    app: geodns
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
 
 ---
 apiVersion: v1
@@ -109,6 +110,7 @@ metadata:
   name: {{ include "afn.fullname" . }}-patch-geodns
   namespace: {{ .Release.Namespace }}
   labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
 ---
@@ -116,6 +118,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ include "afn.fullname" . }}-patch-geodns
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 rules:
 - apiGroups: ["apps"]
   resources: ["daemonsets"]
@@ -128,6 +132,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: {{ include "afn.fullname" . }}-patch-geodns
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 subjects:
 - kind: ServiceAccount
   name: {{ include "afn.fullname" . }}-patch-geodns
@@ -143,6 +149,8 @@ kind: ConfigMap
 metadata:
   name: {{ include "afn.fullname" $context }}-geodns-{{ $context.Release.Revision }}
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 data:
   geodns.conf: |
     ; GeoDNS configuration file
@@ -209,6 +217,8 @@ kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-geodns-ns-record
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: c.{{ .Values.geoDomain }}

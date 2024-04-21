@@ -1,4 +1,4 @@
-{{ $context := . }}
+{{ $context := merge (dict "appName" "lb") . }}
 {{ range .Values.regions }}
 ---
 apiVersion: apps/v1
@@ -7,25 +7,24 @@ metadata:
   name: lb-{{ include "afn.fullname" $context }}-{{ .name }}
   namespace: {{ $context.Release.Namespace }}
   labels:
-    {{- include "afn.labels" $context | nindent 4 }}
-    app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+    {{- include "afn.app-labels" $context | nindent 4 }}
+    app.kubernetes.io/region: {{ .name }}
   annotations:
     secret.reloader.stakater.com/reload: "lb-crt-secret,lb-ctrl-plane-crt-secret,{{ .name }}-crt-secret"
 spec:
   selector:
     matchLabels:
-      {{- include "afn.selectorLabels" $context | nindent 6 }}
-      app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+      {{- include "afn.app-selectorLabels" $context | nindent 6 }}
+      app.kubernetes.io/region: {{ .name }}
   template:
     metadata:
-      {{- with $context.Values.podAnnotations }}
+      {{- with $context.Values.lb.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "afn.selectorLabels" $context | nindent 8 }}
-        app: lb
-        app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+        {{- include "afn.app-selectorLabels" $context | nindent 8 }}
+        app.kubernetes.io/region: {{ .name }}
     spec:
       dnsConfig:
         options:
@@ -41,9 +40,11 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "afn.serviceAccountName" $context }}
       securityContext:
-        {{- toYaml $context.Values.podSecurityContext | nindent 8 }}
+        {{- toYaml $context.Values.lb.podSecurityContext | nindent 8 }}
       initContainers:
         - name: setup-pages
+          securityContext:
+            {{- toYaml $context.Values.lb.securityContext | nindent 12 }}
           image: "{{ $context.Values.lb.pages.image.repository }}:{{ $context.Values.lb.pages.image.tag | default $context.Chart.AppVersion }}"
           imagePullPolicy: {{ $context.Values.lb.pages.image.pullPolicy }}
           command: [ sh ]
@@ -55,6 +56,8 @@ spec:
             - name: pages
               mountPath: /pages
         - name: setup-admin
+          securityContext:
+            {{- toYaml $context.Values.lb.securityContext | nindent 12 }}
           image: "{{ $context.Values.lb.admin.image.repository }}:{{ $context.Values.lb.admin.image.tag | default $context.Chart.AppVersion }}"
           imagePullPolicy: {{ $context.Values.lb.admin.image.pullPolicy }}
           command: [ sh ]
@@ -68,7 +71,7 @@ spec:
       containers:
         - name: {{ $context.Chart.Name }}
           securityContext:
-            {{- toYaml $context.Values.securityContext | nindent 12 }}
+            {{- toYaml $context.Values.lb.securityContext | nindent 12 }}
           image: "{{ $context.Values.lb.image.repository }}:{{ $context.Values.lb.image.tag | default $context.Chart.AppVersion }}"
           imagePullPolicy: {{ $context.Values.lb.image.pullPolicy }}
           ports:
@@ -110,16 +113,16 @@ spec:
             - name: admin
               mountPath: /admin
           resources:
-            {{- toYaml $context.Values.resources | nindent 12 }}
+            {{- toYaml $context.Values.lb.resources | nindent 12 }}
       {{- with .nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.affinity }}
+      {{- with $context.Values.lb.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $context.Values.tolerations }}
+      {{- with $context.Values.lb.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -149,6 +152,8 @@ kind: Service
 metadata:
   name: lb-{{ .name }}
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
     external-dns.alpha.kubernetes.io/hostname: {{ .name }}.{{ $context.Values.geoDomain }}
     external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
@@ -158,13 +163,16 @@ spec:
     name: external
   clusterIP: None
   selector:
-    app.region: lb-{{ include "afn.fullname" $context }}-{{ .name }}
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
+    app.kubernetes.io/region: {{ .name }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ .name }}-crt
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   secretName: {{ .name }}-crt-secret
   dnsNames:
@@ -182,6 +190,8 @@ kind: Service
 metadata:
   name: lb
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
     external-dns.alpha.kubernetes.io/hostname: lb.{{ $context.Values.geoDomain }}
     external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
@@ -191,13 +201,15 @@ spec:
     name: external
   clusterIP: None
   selector:
-    app: lb
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: lb-ctrl-plane
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
     external-dns.alpha.kubernetes.io/hostname: ctrl-plane.{{ $context.Values.geoDomain }}
     external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
@@ -207,13 +219,15 @@ spec:
     name: external
   clusterIP: None
   selector:
-    app: lb
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
 ---
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-app-cname
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: {{ $context.Values.lb.app.domain }}
@@ -227,6 +241,8 @@ kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-realtime-cname
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: {{ $context.Values.lb.realtime.domain }}
@@ -244,6 +260,8 @@ kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-api-cname
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: {{ $context.Values.lb.api.domain }}
@@ -256,6 +274,8 @@ kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-pages-cname
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: {{ $context.Values.lb.pages.domain }}
@@ -268,6 +288,8 @@ kind: DNSEndpoint
 metadata:
   name: {{ include "afn.fullname" $context }}-admin-cname
   namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   endpoints:
   - dnsName: {{ $context.Values.lb.admin.domain }}
@@ -280,6 +302,8 @@ kind: Certificate
 metadata:
   name: lb-crt
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   secretName: lb-crt-secret
   dnsNames:
@@ -296,6 +320,8 @@ kind: Certificate
 metadata:
   name: lb-ctrl-plane-crt
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   secretName: lb-ctrl-plane-crt-secret
   dnsNames:
@@ -312,6 +338,8 @@ kind: Certificate
 metadata:
   name: app-crt
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
 spec:
   secretName: app-crt-secret
   dnsNames:

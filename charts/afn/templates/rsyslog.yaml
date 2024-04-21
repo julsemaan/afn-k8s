@@ -1,37 +1,46 @@
+{{ $context := merge (dict "appName" "rsyslog") . }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "afn.fullname" . }}-syslog
+  name: rsyslog-{{ include "afn.fullname" . }}
   labels:
-    app: rsyslog
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rsyslog
+      {{- include "afn.app-selectorLabels" $context | nindent 6 }}
   template:
     metadata:
       labels:
-        app: rsyslog
+        {{- include "afn.app-selectorLabels" $context | nindent 8 }}
     spec:
-      {{- with .Values.geodns.imagePullSecrets }}
+      {{- with .Values.rsyslog.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $context.Values.rsyslog.affinity }}
       affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                - key: node-role.kubernetes.io/control-plane
-                  operator: Exists
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $context.Values.rsyslog.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $context.Values.rsyslog.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml $context.Values.rsyslog.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ include "afn.serviceAccountName" $context }}
       containers:
       - name: rsyslog
+        securityContext:
+          {{- toYaml $context.Values.rsyslog.securityContext | nindent 10 }}
         image: "{{ .Values.rsyslog.image.repository }}:{{ .Values.rsyslog.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.rsyslog.image.pullPolicy }}
-        securityContext:
-          runAsUser: 0
         ports:
         - containerPort: 514
           protocol: TCP
@@ -40,6 +49,8 @@ spec:
         volumeMounts:
         - mountPath: /logs
           name: logs
+        resources:
+          {{- toYaml $context.Values.rsyslog.resources | nindent 12 }}
       volumes:
         - name: logs
           hostPath:
@@ -49,12 +60,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: rsyslog
-  name: {{ include "afn.fullname" . }}-syslog
+  name: rsyslog-{{ include "afn.fullname" $context }}
+  namespace: {{ $context.Release.Namespace }}
 spec:
   selector:
-    app: rsyslog
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
   ports:
     - protocol: TCP
       name: rsyslog

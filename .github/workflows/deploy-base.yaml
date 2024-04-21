@@ -16,6 +16,9 @@ on:
 jobs:
   deployment:
     environment: ${{ github.event.inputs.environment || 'main' }}
+    concurrency:
+      group: helm-afn-k8s
+      cancel-in-progress: false
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v4
