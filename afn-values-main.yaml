@@ -65,3 +65,12 @@ geodns:
 
 api:
   bucket: afn-main-3jdc8
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - afn-v3-realtime
