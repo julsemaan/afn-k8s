@@ -13,8 +13,8 @@ X Add API with backed by OBJ to the chart
   X Periodic upload of all DBs to OBJ
 X Build geodns via GHA and use auto-PR workflow
 X Build API via GHA and use auto-PR workflow
+X Have API statefulset have affinity to ORD or GRU or other lower latency places
 - Automate periodic builds of rsyslog image
-- Have API statefulset have affinity to ORD or GRU or other lower latency places
 - Health check on doing a DNS lookup to test connectivity 
 
 X Install linode api secrets via GHA
