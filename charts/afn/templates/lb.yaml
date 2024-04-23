@@ -10,7 +10,7 @@ metadata:
     {{- include "afn.app-labels" $context | nindent 4 }}
     app.kubernetes.io/region: {{ .name }}
   annotations:
-    secret.reloader.stakater.com/reload: "lb-crt-secret,lb-ctrl-plane-crt-secret,{{ .name }}-crt-secret"
+    secret.reloader.stakater.com/reload: "lb-crt-secret,{{ .name }}-crt-secret"
 spec:
   selector:
     matchLabels:
@@ -99,9 +99,6 @@ spec:
             - name: lb-crt
               mountPath: /etc/caddy/lb-crt
               readOnly: true
-            - name: ctrl-plane-crt
-              mountPath: /etc/caddy/ctrl-plane-crt
-              readOnly: true
             - name: {{ .name }}-crt
               mountPath: /etc/caddy/{{ .name }}-crt
               readOnly: true
@@ -137,9 +134,6 @@ spec:
       - name: lb-crt
         secret:
           secretName: lb-crt-secret
-      - name: ctrl-plane-crt
-        secret:
-          secretName: lb-ctrl-plane-crt-secret
       - name: app-crt
         secret:
           secretName: app-crt-secret
@@ -155,6 +149,7 @@ metadata:
   labels:
     {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
+    prometheus.io/instance: {{ .name }}.{{ $context.Values.geoDomain }}
     prometheus.io/scrape: 'true'
     prometheus.io/port:   '9090'
 spec:
@@ -173,6 +168,7 @@ metadata:
   labels:
     {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
+    prometheus.io/instance: {{ .name }}.{{ $context.Values.geoDomain }}
     prometheus.io/scrape: 'true'
     prometheus.io/port:   '9091'
 spec:
@@ -230,24 +226,6 @@ metadata:
     {{- include "afn.app-labels" $context | nindent 4 }}
   annotations:
     external-dns.alpha.kubernetes.io/hostname: lb.{{ $context.Values.geoDomain }}
-    external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
-spec:
-  ports:
-  - port: 80
-    name: external
-  clusterIP: None
-  selector:
-    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: lb-ctrl-plane
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "afn.app-labels" $context | nindent 4 }}
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: ctrl-plane.{{ $context.Values.geoDomain }}
     external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP
 spec:
   ports:
@@ -346,24 +324,6 @@ spec:
   - lb.{{ $context.Values.geoDomain }}
   issuerRef:
     name: letsencrypt-production
-    # We can reference ClusterIssuers by changing the kind here.
-    # The default value is Issuer (i.e. a locally namespaced Issuer)
-    kind: ClusterIssuer
-    group: cert-manager.io
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: lb-ctrl-plane-crt
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "afn.app-labels" $context | nindent 4 }}
-spec:
-  secretName: lb-ctrl-plane-crt-secret
-  dnsNames:
-  - ctrl-plane.{{ $context.Values.geoDomain }}
-  issuerRef:
-    name: letsencrypt-staging
     # We can reference ClusterIssuers by changing the kind here.
     # The default value is Issuer (i.e. a locally namespaced Issuer)
     kind: ClusterIssuer

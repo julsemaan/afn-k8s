@@ -4,6 +4,8 @@ metadata:
   name: {{ include "prometheus.fullname" . }}
   labels:
     {{- include "prometheus.labels" . | nindent 4 }}
+  annotations:
+    configmap.reloader.stakater.com/reload: {{ include "prometheus.fullname" . }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -33,7 +35,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           args:
-            - "--storage.tsdb.retention.time=12h"
+            - "--storage.tsdb.retention.time=1h"
             - "--config.file=/etc/prometheus/prometheus.yml"
             - "--storage.tsdb.path=/prometheus/"
           securityContext:

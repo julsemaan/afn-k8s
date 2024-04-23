@@ -80,6 +80,7 @@ metadata:
   name: node-exporter-{{ $type }}
   namespace: {{ $context.Release.Namespace }}
   annotations:
+    prometheus.io/instance: control-plane.{{ $context.Values.geoDomain }}
     prometheus.io/scrape: 'true'
     prometheus.io/port:   '9100'
 spec:

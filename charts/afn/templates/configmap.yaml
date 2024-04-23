@@ -115,30 +115,6 @@ data:
       import afn_webserver
     }
     
-    ctrl-plane.{{ $context.Values.geoDomain }} {
-      tls /etc/caddy/ctrl-plane-crt/tls.crt /etc/caddy/ctrl-plane-crt/tls.key
-
-      import afn_common
-
-      handle /ctrl-plane-metrics {
-        basicauth {
-          {{ $clusterObserverUsername := b64dec $afnSecret.data.CLUSTER_OBSERVER_USERNAME }}
-          {{ $clusterObserverPassword := b64dec $afnSecret.data.CLUSTER_OBSERVER_PASSWORD }}
-          {{ $clusterObserverUsername }} {{ htpasswd $clusterObserverUsername $clusterObserverPassword | replace (printf "%s:" $clusterObserverUsername) "" | b64enc }}
-        }
-        rewrite /ctrl-plane-metrics /metrics
-        reverse_proxy http://node-exporter-control-plane.afn.svc.cluster.local:9100 {
-          transport http {
-            resolvers 169.254.20.10
-          }
-        }
-      }
-
-      handle {
-        respond "Unsupported path" 400
-      }
-    }
-    
     {{ .name }}.{{ $context.Values.geoDomain }} {
       tls /etc/caddy/{{ .name }}-crt/tls.crt /etc/caddy/{{ .name }}-crt/tls.key
 
@@ -158,38 +134,19 @@ data:
         import backend_proxy
       }
 
-      handle /metrics {
+      handle /federate {
         basicauth {
           {{ $clusterObserverUsername := b64dec $afnSecret.data.CLUSTER_OBSERVER_USERNAME }}
           {{ $clusterObserverPassword := b64dec $afnSecret.data.CLUSTER_OBSERVER_PASSWORD }}
           {{ $clusterObserverUsername }} {{ htpasswd $clusterObserverUsername $clusterObserverPassword | replace (printf "%s:" $clusterObserverUsername) "" | b64enc }}
         }
-        metrics
-      }
-
-      handle /node-metrics {
-        basicauth {
-          {{ $clusterObserverUsername := b64dec $afnSecret.data.CLUSTER_OBSERVER_USERNAME }}
-          {{ $clusterObserverPassword := b64dec $afnSecret.data.CLUSTER_OBSERVER_PASSWORD }}
-          {{ $clusterObserverUsername }} {{ htpasswd $clusterObserverUsername $clusterObserverPassword | replace (printf "%s:" $clusterObserverUsername) "" | b64enc }}
-        }
-        rewrite /node-metrics /metrics
-        reverse_proxy http://169.254.20.10:9100
-      }
-
-      handle /coredns-metrics {
-        basicauth {
-          {{ $clusterObserverUsername := b64dec $afnSecret.data.CLUSTER_OBSERVER_USERNAME }}
-          {{ $clusterObserverPassword := b64dec $afnSecret.data.CLUSTER_OBSERVER_PASSWORD }}
-          {{ $clusterObserverUsername }} {{ htpasswd $clusterObserverUsername $clusterObserverPassword | replace (printf "%s:" $clusterObserverUsername) "" | b64enc }}
-        }
-        rewrite /coredns-metrics /metrics
-        reverse_proxy http://kube-dns.kube-system.svc.cluster.local:9153 {
+        reverse_proxy http://prometheus.monitoring.svc.cluster.local:9090 {
           transport http {
             resolvers 169.254.20.10
           }
         }
       }
+
 
       handle {
         respond "Unsupported path" 400
