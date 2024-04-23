@@ -19,6 +19,14 @@ data:
       respond /healthz 200
     }
 
+    :9090 {
+      metrics
+    }
+
+    :9091 {
+      reverse_proxy http://169.254.20.10:9100
+    }
+
     (no_events_access) {
       handle /events {
         respond "Unsupported path" 400

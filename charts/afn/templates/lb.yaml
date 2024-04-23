@@ -150,6 +150,42 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: lb-metrics-{{ .name }}
+  namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port:   '9090'
+spec:
+  ports:
+  - port: 9090
+    name: metrics
+  selector:
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
+    app.kubernetes.io/region: {{ .name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb-node-metrics-{{ .name }}
+  namespace: {{ $context.Release.Namespace }}
+  labels:
+    {{- include "afn.app-labels" $context | nindent 4 }}
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port:   '9091'
+spec:
+  ports:
+  - port: 9091
+    name: metrics
+  selector:
+    {{- include "afn.app-selectorLabels" $context | nindent 4 }}
+    app.kubernetes.io/region: {{ .name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: lb-{{ .name }}
   namespace: {{ $context.Release.Namespace }}
   labels:
