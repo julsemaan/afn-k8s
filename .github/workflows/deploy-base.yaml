@@ -60,6 +60,7 @@ jobs:
     - run: kubectl create namespace afn --dry-run -o yaml | kubectl apply -f -
     - run: kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
     - run: kubectl create namespace reloader --dry-run -o yaml | kubectl apply -f -
+    - run: kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
     - run: |
         find secret/ -type f -exec kubectl apply -f {} \;
 
@@ -73,6 +74,15 @@ jobs:
           [
             "${{vars.AFN_VALUES_PATH}}"
           ]
+      env:
+        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+    
+    - name: 'Deploy prometheus'
+      uses: 'vimeda/helm@v1.7.0'
+      with:
+        release: 'prometheus'
+        namespace: 'monitoring'
+        chart: 'charts/prometheus'
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
     
