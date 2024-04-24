@@ -39,7 +39,3 @@ lb:
   api:
     domain: lb-api.v3geo-test.semaan.ca
 
-geodns:
-  image:
-    pullPolicy: Always
-    tag: ca7a11c00eedb01a807bcc53efa55823e9990bb5

@@ -57,12 +57,6 @@ lb:
   api:
     domain: api.anyfile-notepad.semaan.ca
 
-geodns:
-  image:
-    repository: julsemaan/geodns
-    tag: test2
-    pullPolicy: Always
-
 api:
   bucket: afn-main-3jdc8
   affinity:
