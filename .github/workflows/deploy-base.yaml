@@ -1,3 +1,4 @@
+---
 name: Deploy AFN base dependencies
 
 on:
@@ -21,136 +22,136 @@ jobs:
       cancel-in-progress: false
     runs-on: 'ubuntu-latest'
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup KUBECONFIG_B64
-      run: |
-        printf "$KUBECONFIG_DATA" > /tmp/KUBECONFIG_DATA
-        echo "KUBECONFIG_B64=$(cat /tmp/KUBECONFIG_DATA | base64 -w 0)" >> $GITHUB_ENV
-      env:
-        KUBECONFIG_DATA: ${{secrets.KUBECONFIG}}
+      - name: Setup KUBECONFIG_B64
+        run: |
+          printf "$KUBECONFIG_DATA" > /tmp/KUBECONFIG_DATA
+          echo "KUBECONFIG_B64=$(cat /tmp/KUBECONFIG_DATA | base64 -w 0)" >> $GITHUB_ENV
+        env:
+          KUBECONFIG_DATA: ${{secrets.KUBECONFIG}}
 
-    - name: Create secret dir
-      run: mkdir -p secret/
+      - name: Create secret dir
+        run: mkdir -p secret/
 
-    - name: Setup linode secrets file
-      run: |
-        find templates-secrets/ -type f -exec bash -c 'cat {} | envsubst > secret/`basename "$1"`' -- {} \;
-      env:
-        LINODE_ACCESS_TOKEN: ${{ secrets.LINODE_ACCESS_TOKEN }}
-        STRIPE_SK: ${{ secrets.STRIPE_SK }}
-        STRIPE_PP_PLAN: ${{ vars.STRIPE_PP_PLAN }}
-        STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-        AFN_SUPPORT_EMAIL: ${{ vars.AFN_SUPPORT_EMAIL }}
-        CLUSTER_OBSERVER_USERNAME: ${{ secrets.CLUSTER_OBSERVER_USERNAME }}
-        CLUSTER_OBSERVER_PASSWORD: ${{ secrets.CLUSTER_OBSERVER_PASSWORD }}
-        SMTP_HOST: ${{ vars.SMTP_HOST }}
-        SMTP_PORT: ${{ vars.SMTP_PORT }}
-        SMTP_USER: ${{ secrets.SMTP_USER }}
-        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-        SMTP_FROM: ${{ vars.SMTP_FROM }}
-        AFN_REST_USERNAME: ${{ secrets.AFN_REST_USERNAME }}
-        AFN_REST_PASSWORD: ${{ secrets.AFN_REST_PASSWORD }}
-        OBJ_ACCESS_KEY: ${{ secrets.OBJ_ACCESS_KEY }}
-        OBJ_SECRET_KEY: ${{ secrets.OBJ_SECRET_KEY }}
+      - name: Setup linode secrets file
+        run: |
+          find templates-secrets/ -type f -exec bash -c 'cat {} | envsubst > secret/`basename "$1"`' -- {} \;
+        env:
+          LINODE_ACCESS_TOKEN: ${{ secrets.LINODE_ACCESS_TOKEN }}
+          STRIPE_SK: ${{ secrets.STRIPE_SK }}
+          STRIPE_PP_PLAN: ${{ vars.STRIPE_PP_PLAN }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          AFN_SUPPORT_EMAIL: ${{ vars.AFN_SUPPORT_EMAIL }}
+          CLUSTER_OBSERVER_USERNAME: ${{ secrets.CLUSTER_OBSERVER_USERNAME }}
+          CLUSTER_OBSERVER_PASSWORD: ${{ secrets.CLUSTER_OBSERVER_PASSWORD }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM: ${{ vars.SMTP_FROM }}
+          AFN_REST_USERNAME: ${{ secrets.AFN_REST_USERNAME }}
+          AFN_REST_PASSWORD: ${{ secrets.AFN_REST_PASSWORD }}
+          OBJ_ACCESS_KEY: ${{ secrets.OBJ_ACCESS_KEY }}
+          OBJ_SECRET_KEY: ${{ secrets.OBJ_SECRET_KEY }}
 
-    - uses: tale/kubectl-action@v1
-      with:
-        base64-kube-config: ${{ env.KUBECONFIG_B64 }}
-    - run: kubectl create namespace afn --dry-run -o yaml | kubectl apply -f -
-    - run: kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
-    - run: kubectl create namespace reloader --dry-run -o yaml | kubectl apply -f -
-    - run: kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
-    - run: |
-        find secret/ -type f -exec kubectl apply -f {} \;
+      - uses: tale/kubectl-action@v1
+        with:
+          base64-kube-config: ${{ env.KUBECONFIG_B64 }}
+      - run: kubectl create namespace afn --dry-run -o yaml | kubectl apply -f -
+      - run: kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
+      - run: kubectl create namespace reloader --dry-run -o yaml | kubectl apply -f -
+      - run: kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
+      - run: |
+          find secret/ -type f -exec kubectl apply -f {} \;
 
-    - name: 'Deploy nodelocaldns'
-      uses: 'vimeda/helm@v1.7.0'
-      with:
-        release: 'nodelocaldns'
-        namespace: 'kube-system'
-        chart: 'charts/nodelocaldns'
-        value-files: >-
-          [
-            "${{vars.AFN_VALUES_PATH}}"
-          ]
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
-    
-    - name: 'Deploy prometheus'
-      uses: 'vimeda/helm@v1.7.0'
-      with:
-        release: 'prometheus'
-        namespace: 'monitoring'
-        chart: 'charts/prometheus'
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
-    
-    - name: 'Deploy external-dns'
-      uses: 'vimeda/helm@v1.7.0'
-      with:
-        release: 'external-dns'
-        namespace: 'afn'
-        chart: 'oci://registry-1.docker.io/bitnamicharts/external-dns'
-        value-files: >-
-          [
-            "${{vars.EXTERNAL_DNS_VALUES_PATH}}"
-          ]
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+      - name: 'Deploy nodelocaldns'
+        uses: 'vimeda/helm@v1.7.0'
+        with:
+          release: 'nodelocaldns'
+          namespace: 'kube-system'
+          chart: 'charts/nodelocaldns'
+          value-files: >-
+            [
+              "${{vars.AFN_VALUES_PATH}}"
+            ]
+        env:
+          KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
 
-    - name: 'Deploy cert-manager'
-      uses: 'vimeda/helm@v1.7.0'
-      with:
-        release: 'cert-manager'
-        namespace: 'cert-manager'
-        chart: 'jetstack/cert-manager'
-        chart-version: v1.13.1
-        repo: 'https://charts.jetstack.io'
-        repo-alias: jetstack
-        values: |
-          installCRDs: true
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+      - name: 'Deploy prometheus'
+        uses: 'vimeda/helm@v1.7.0'
+        with:
+          release: 'prometheus'
+          namespace: 'monitoring'
+          chart: 'charts/prometheus'
+        env:
+          KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
 
-    - name: 'Deploy cert-manager-webhook-linode'
-      uses: 'vimeda/helm@v1.7.0'
-      with:
-        release: 'cert-manager-webhook-linode'
-        namespace: 'cert-manager'
-        chart: 'https://github.com/slicen/cert-manager-webhook-linode/releases/download/v0.2.0/cert-manager-webhook-linode-v0.2.0.tgz'
-        values: |
-          deployment:
-            logLevel: null
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+      - name: 'Deploy external-dns'
+        uses: 'vimeda/helm@v1.7.0'
+        with:
+          release: 'external-dns'
+          namespace: 'afn'
+          chart: 'oci://registry-1.docker.io/bitnamicharts/external-dns'
+          value-files: >-
+            [
+              "${{vars.EXTERNAL_DNS_VALUES_PATH}}"
+            ]
+        env:
+          KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
 
-    - name: 'Deploy stakater reloader'
-      uses: 'vimeda/helm@v1.7.0'
-      with:
-        release: 'reloader'
-        namespace: 'reloader'
-        chart: 'stakater/reloader'
-        chart-version: v1.0.69
-        repo: 'https://stakater.github.io/stakater-charts'
-        repo-alias: stakater
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+      - name: 'Deploy cert-manager'
+        uses: 'vimeda/helm@v1.7.0'
+        with:
+          release: 'cert-manager'
+          namespace: 'cert-manager'
+          chart: 'jetstack/cert-manager'
+          chart-version: v1.13.1
+          repo: 'https://charts.jetstack.io'
+          repo-alias: jetstack
+          values: |
+            installCRDs: true
+        env:
+          KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
 
-    - name: 'Deploy fluent-bit'
-      uses: 'vimeda/helm@v1.7.0'
-      with:
-        release: 'fluent-bit'
-        namespace: 'kube-system'
-        chart: 'fluent/fluent-bit'
-        chart-version: '0.39.1'
-        repo: 'https://fluent.github.io/helm-charts'
-        repo-alias: fluent
-        value-files: >-
-          [
-            "fluent-bit-values.yaml"
-          ]
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+      - name: 'Deploy cert-manager-webhook-linode'
+        uses: 'vimeda/helm@v1.7.0'
+        with:
+          release: 'cert-manager-webhook-linode'
+          namespace: 'cert-manager'
+          chart: 'https://github.com/slicen/cert-manager-webhook-linode/releases/download/v0.2.0/cert-manager-webhook-linode-v0.2.0.tgz'
+          values: |
+            deployment:
+              logLevel: null
+        env:
+          KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+
+      - name: 'Deploy stakater reloader'
+        uses: 'vimeda/helm@v1.7.0'
+        with:
+          release: 'reloader'
+          namespace: 'reloader'
+          chart: 'stakater/reloader'
+          chart-version: v1.0.69
+          repo: 'https://stakater.github.io/stakater-charts'
+          repo-alias: stakater
+        env:
+          KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+
+      - name: 'Deploy fluent-bit'
+        uses: 'vimeda/helm@v1.7.0'
+        with:
+          release: 'fluent-bit'
+          namespace: 'kube-system'
+          chart: 'fluent/fluent-bit'
+          chart-version: '0.39.1'
+          repo: 'https://fluent.github.io/helm-charts'
+          repo-alias: fluent
+          value-files: >-
+            [
+              "fluent-bit-values.yaml"
+            ]
+        env:
+          KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
 
 

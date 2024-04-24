@@ -1,3 +1,4 @@
+---
 name: Deploy AFN helm chart
 
 on:
@@ -25,19 +26,19 @@ jobs:
       cancel-in-progress: false
     runs-on: 'ubuntu-latest'
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: 'Deploy'
-      uses: 'vimeda/helm@v1.7.0'
-      with:
-        release: 'afn'
-        namespace: 'afn'
-        chart: 'charts/afn'
-        token: '${{ github.token }}'
-        timeout: 10m
-        value-files: >-
-          [
-            "${{vars.AFN_VALUES_PATH}}"
-          ]
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+      - name: 'Deploy'
+        uses: 'vimeda/helm@v1.7.0'
+        with:
+          release: 'afn'
+          namespace: 'afn'
+          chart: 'charts/afn'
+          token: '${{ github.token }}'
+          timeout: 10m
+          value-files: >-
+            [
+              "${{vars.AFN_VALUES_PATH}}"
+            ]
+        env:
+          KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
