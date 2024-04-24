@@ -6,6 +6,9 @@ metadata:
   namespace: kube-system
 data:
   deployment: |
+    metadata:
+      annotations:
+        configmap.reloader.stakater.com/reload: "coredns"
     spec:
       replicas: 2
       template:
@@ -89,7 +92,7 @@ metadata:
   name: {{ include "afn.fullname" . }}-patch-coredns
   namespace: kube-system
   annotations:
-    configmap.reloader.stakater.com/reload: "coredns"
+    configmap.reloader.stakater.com/reload: "coredns,{{ include "afn.fullname" . }}-coredns-patches"
   labels:
     app: {{ include "afn.fullname" . }}-patch-coredns
 spec:
@@ -115,6 +118,5 @@ spec:
               
               kubectl get cm {{ include "afn.fullname" . }}-coredns-patches -o json | jq -r .data.configmap > /tmp/patch
               kubectl patch configmap coredns -n kube-system --patch-file /tmp/patch
-              kubectl rollout restart deployment coredns -n kube-system
               sleep 3600
             done
