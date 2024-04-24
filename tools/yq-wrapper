@@ -4,8 +4,8 @@ tmp=$(mktemp)
 
 cat > $tmp
 
-if cat $tmp | yq >/dev/null 2>/dev/null; then
-  cat $tmp | yq 2>/dev/null
+if yamlfmt /dev/stdin < $tmp >/dev/null 2>/dev/null; then
+  yamlfmt /dev/stdin < $tmp
 else 
   cat $tmp
 fi
