@@ -68,7 +68,7 @@ geodns:
     repository: ghcr.io/julsemaan/afn-k8s/geodns
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "ca7a11c00eedb01a807bcc53efa55823e9990bb5"
+    tag: "15d649dedb8849147ea6a32119d29a38b5473caf"
   imagePullSecrets: []
   podAnnotations: {}
   podSecurityContext: {}
@@ -88,7 +88,7 @@ rsyslog:
   imagePullSecrets: []
   podAnnotations: {}
   podSecurityContext: {}
-  securityContext: 
+  securityContext:
     runAsUser: 0
   resources: {}
   nodeSelector: {}
@@ -98,9 +98,8 @@ rsyslog:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
           - matchExpressions:
-            - key: node-role.kubernetes.io/control-plane
-              operator: Exists
-
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
 controlRegion: {}
 regions: []
 nameOverride: ""
@@ -113,4 +112,3 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
