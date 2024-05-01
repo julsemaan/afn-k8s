@@ -56,11 +56,11 @@ backend:
     pullPolicy: IfNotPresent
   appProdImage:
     repository: ghcr.io/julsemaan/anyfile-notepad/client-light
-    tag: "216cd7c0ce733666b1bf5e2e8e3eaacce458f782"
+    tag: "f0e803b47fd1b4a3316e40114659b9be9fd280c8"
     pullPolicy: IfNotPresent
   appDevImage:
     repository: ghcr.io/julsemaan/anyfile-notepad/client-light
-    tag: 216cd7c0ce733666b1bf5e2e8e3eaacce458f782
+    tag: f0e803b47fd1b4a3316e40114659b9be9fd280c8
     pullPolicy: IfNotPresent
 geodns:
   imagePullSecrets: []
