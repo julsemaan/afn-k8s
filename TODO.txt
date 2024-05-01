@@ -16,6 +16,7 @@ X Build API via GHA and use auto-PR workflow
 X Have API statefulset have affinity to ORD or GRU or other lower latency places
 - Automate periodic builds of rsyslog image
 - Health check on doing a DNS lookup to test connectivity 
+- Make lb leaner and not require a restart when admin or pages change
 
 X Install linode api secrets via GHA
 - Add monit checks for OS level
