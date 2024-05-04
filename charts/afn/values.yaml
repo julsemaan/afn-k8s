@@ -39,7 +39,7 @@ lb:
 api:
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/api
-    tag: b13e4aec2f0c3f0b1688397705ce92acd5e5b61a
+    tag: 770f8e0186ceb1c5ad767428820503ce56cf9752
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   podAnnotations: {}
@@ -56,11 +56,11 @@ backend:
     pullPolicy: IfNotPresent
   appProdImage:
     repository: ghcr.io/julsemaan/anyfile-notepad/client-light
-    tag: "563b328f53103d8312577f9e6dabf70236f079b9"
+    tag: "770f8e0186ceb1c5ad767428820503ce56cf9752"
     pullPolicy: IfNotPresent
   appDevImage:
     repository: ghcr.io/julsemaan/anyfile-notepad/client-light
-    tag: 563b328f53103d8312577f9e6dabf70236f079b9
+    tag: a68ac8689f664d467ef07f3f0ce3ac7278bd9808
     pullPolicy: IfNotPresent
 geodns:
   imagePullSecrets: []
