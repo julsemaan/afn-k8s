@@ -6,6 +6,7 @@ on:
     paths:
       # There should be more here but that's a start
       - 'templates-secrets/**'
+      - '.github/workflows/deploy-base.yaml'
   workflow_dispatch:
     branches: ['**']
     inputs:
