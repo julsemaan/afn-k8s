@@ -53,6 +53,8 @@ jobs:
         AFN_REST_PASSWORD: ${{ secrets.AFN_REST_PASSWORD }}
         OBJ_ACCESS_KEY: ${{ secrets.OBJ_ACCESS_KEY }}
         OBJ_SECRET_KEY: ${{ secrets.OBJ_SECRET_KEY }}
+        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
     - uses: tale/kubectl-action@v1
       with:
