@@ -69,7 +69,7 @@ geodns:
     repository: ghcr.io/julsemaan/afn-k8s/geodns
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "15d649dedb8849147ea6a32119d29a38b5473caf"
+    tag: "b13483d3e6cd5e117ba11318f82b8de7c9ccefba"
   imagePullSecrets: []
   podAnnotations: {}
   podSecurityContext: {}
