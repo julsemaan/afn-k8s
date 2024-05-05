@@ -1,3 +1,4 @@
+---
 
 baseDomain: semaan.ca
 geoDomain: v3geo.semaan.ca
@@ -47,7 +48,7 @@ dnsRegions:
 lb:
   app:
     domain: anyfile-notepad.semaan.ca
-  realtime: 
+  realtime:
     domain: realtime.anyfile-notepad.semaan.ca
     region: realtime-region
   pages:
@@ -64,7 +65,7 @@ api:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
           - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - afn-v3-realtime
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - afn-v3-realtime

@@ -1,3 +1,4 @@
+---
 name: Docker Image rsyslog
 
 on:
@@ -38,8 +39,7 @@ jobs:
           cache_registry: ghcr.io/julsemaan/afn-k8s/cache
           path: rsyslog-docker/
           extra_args: >-
-            --push-retry 5
-
+            --push-retry 5 #magic___^_^___line
   pr_afn_k8s:
     concurrency:
       group: prs-to-afn-k8s

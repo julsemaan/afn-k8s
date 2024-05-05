@@ -1,3 +1,4 @@
+---
 - name: Monit configuration
   hosts: "{{prefix}}controlPlane:{{prefix}}workerNode"
   tasks:

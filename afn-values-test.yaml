@@ -1,3 +1,4 @@
+---
 
 baseDomain: semaan.ca
 geoDomain: v3geo-test.semaan.ca
@@ -30,7 +31,7 @@ api:
 lb:
   app:
     domain: lb-app.v3geo-test.semaan.ca
-  realtime: 
+  realtime:
     domain: lb-realtime.v3geo-test.semaan.ca
   pages:
     domain: lb-pages.v3geo-test.semaan.ca
