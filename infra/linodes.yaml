@@ -1,20 +1,19 @@
----
 - name: Create Linode
   hosts: localhost
   tasks:
-    - name: "Create linodes"
-      linode_v4:
-        label: "{{ label }}{{ item.key }}"
-        access_token: "{{ token }}"
-        type: "{{ item.value.instanceType }}"
-        region: "{{ item.value.region }}"
-        image: linode/ubuntu22.04
-        root_pass: "{{ password }}"
-        authorized_keys: "{{ ssh_keys }}"
-        group: "{{ item.value.typeTag }}"
-        tags:
-          - "{{ item.value.typeTag }}"
-          - "{{ group }}"
-        state: present
-      with_items: "{{ linodes | dict2items }}"
+  - name: "Create linodes"
+    linode_v4:
+      label: "{{ label }}{{ item.key }}"
+      access_token: "{{ token }}"
+      type: "{{ item.value.instanceType }}"
+      region: "{{ item.value.region }}"
+      image: linode/ubuntu22.04
+      root_pass: "{{ password }}"
+      authorized_keys: "{{ ssh_keys }}"
+      group: "{{ item.value.typeTag }}"
+      tags: 
+        - "{{ item.value.typeTag }}"
+        - "{{ group }}"
+      state: present
+    with_items: "{{ linodes | dict2items }}"
 
