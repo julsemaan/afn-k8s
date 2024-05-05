@@ -180,7 +180,7 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              host: {? {.Values.dnsLocalIp: ''} : ''}
+              host: "{{.Values.dnsLocalIp}}"
               path: /health
               port: 8080
             initialDelaySeconds: 60
