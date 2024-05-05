@@ -96,7 +96,7 @@ spec:
           volumeMounts:
             - name: prod-app
               mountPath: /prod-app
-            - name: prod-app
+            - name: dev-app
               mountPath: /dev-app
             - name: persistent
               mountPath: /var/persistent

@@ -14,10 +14,11 @@ X Add API with backed by OBJ to the chart
 X Build geodns via GHA and use auto-PR workflow
 X Build API via GHA and use auto-PR workflow
 X Have API statefulset have affinity to ORD or GRU or other lower latency places
+X Install linode api secrets via GHA
 - Automate periodic builds of rsyslog image
 - Health check on doing a DNS lookup to test connectivity 
-
-X Install linode api secrets via GHA
+- Make lb leaner and not require a restart when admin or pages change
+- Use different subject between prod and test for monit alerts
 - Add monit checks for OS level
   - status of k3s-agent
   - flannel routes in place

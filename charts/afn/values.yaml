@@ -14,7 +14,7 @@ lb:
   pages:
     image:
       repository: ghcr.io/julsemaan/anyfile-notepad/pages
-      tag: 216cd7c0ce733666b1bf5e2e8e3eaacce458f782
+      tag: 526e9e3ff0d69db99c1989b286629019297b81fb
       pullPolicy: IfNotPresent
     domain: pages.DOMAIN_NAME
   admin:
@@ -40,7 +40,7 @@ lb:
 api:
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/api
-    tag: b13e4aec2f0c3f0b1688397705ce92acd5e5b61a
+    tag: f8edb44d4db59fe407840eaea333a7b725f5ea27
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   podAnnotations: {}
@@ -53,15 +53,15 @@ api:
 backend:
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/webserver
-    tag: 216cd7c0ce733666b1bf5e2e8e3eaacce458f782
+    tag: 7d238a7e35bd3bc5d56582c6e3a3875d1e35a2b9
     pullPolicy: IfNotPresent
   appProdImage:
     repository: ghcr.io/julsemaan/anyfile-notepad/client-light
-    tag: "216cd7c0ce733666b1bf5e2e8e3eaacce458f782"
+    tag: "ad0c1be8ee4975602ab2bb77bf66fa516236465d"
     pullPolicy: IfNotPresent
   appDevImage:
     repository: ghcr.io/julsemaan/anyfile-notepad/client-light
-    tag: 216cd7c0ce733666b1bf5e2e8e3eaacce458f782
+    tag: a87e7b61823b119ba7d23fab057da2c513c4ce14
     pullPolicy: IfNotPresent
 geodns:
   imagePullSecrets: []

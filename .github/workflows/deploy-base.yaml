@@ -7,6 +7,7 @@ on:
     paths:
       # There should be more here but that's a start
       - 'templates-secrets/**'
+      - '.github/workflows/deploy-base.yaml'
   workflow_dispatch:
     branches: ['**']
     inputs:
@@ -34,26 +35,29 @@ jobs:
       - name: Create secret dir
         run: mkdir -p secret/
 
-      - name: Setup linode secrets file
-        run: |
-          find templates-secrets/ -type f -exec bash -c 'cat {} | envsubst > secret/`basename "$1"`' -- {} \;
-        env:
-          LINODE_ACCESS_TOKEN: ${{ secrets.LINODE_ACCESS_TOKEN }}
-          STRIPE_SK: ${{ secrets.STRIPE_SK }}
-          STRIPE_PP_PLAN: ${{ vars.STRIPE_PP_PLAN }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          AFN_SUPPORT_EMAIL: ${{ vars.AFN_SUPPORT_EMAIL }}
-          CLUSTER_OBSERVER_USERNAME: ${{ secrets.CLUSTER_OBSERVER_USERNAME }}
-          CLUSTER_OBSERVER_PASSWORD: ${{ secrets.CLUSTER_OBSERVER_PASSWORD }}
-          SMTP_HOST: ${{ vars.SMTP_HOST }}
-          SMTP_PORT: ${{ vars.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          SMTP_FROM: ${{ vars.SMTP_FROM }}
-          AFN_REST_USERNAME: ${{ secrets.AFN_REST_USERNAME }}
-          AFN_REST_PASSWORD: ${{ secrets.AFN_REST_PASSWORD }}
-          OBJ_ACCESS_KEY: ${{ secrets.OBJ_ACCESS_KEY }}
-          OBJ_SECRET_KEY: ${{ secrets.OBJ_SECRET_KEY }}
+    - name: Setup linode secrets file
+      run: |
+        find templates-secrets/ -type f -exec bash -c 'cat {} | envsubst > secret/`basename "$1"`' -- {} \;
+      env:
+        LINODE_ACCESS_TOKEN: ${{ secrets.LINODE_ACCESS_TOKEN }}
+        STRIPE_SK: ${{ secrets.STRIPE_SK }}
+        STRIPE_PP_PLAN: ${{ vars.STRIPE_PP_PLAN }}
+        STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+        AFN_SUPPORT_EMAIL: ${{ vars.AFN_SUPPORT_EMAIL }}
+        CLUSTER_OBSERVER_USERNAME: ${{ secrets.CLUSTER_OBSERVER_USERNAME }}
+        CLUSTER_OBSERVER_PASSWORD: ${{ secrets.CLUSTER_OBSERVER_PASSWORD }}
+        SMTP_HOST: ${{ vars.SMTP_HOST }}
+        SMTP_PORT: ${{ vars.SMTP_PORT }}
+        SMTP_USER: ${{ secrets.SMTP_USER }}
+        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        SMTP_FROM: ${{ vars.SMTP_FROM }}
+        AFN_REST_USERNAME: ${{ secrets.AFN_REST_USERNAME }}
+        AFN_REST_PASSWORD: ${{ secrets.AFN_REST_PASSWORD }}
+        OBJ_ACCESS_KEY: ${{ secrets.OBJ_ACCESS_KEY }}
+        OBJ_SECRET_KEY: ${{ secrets.OBJ_SECRET_KEY }}
+        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        APP_BASE_URL: ${{ vars.APP_BASE_URL }}
 
       - uses: tale/kubectl-action@v1
         with:
