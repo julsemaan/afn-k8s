@@ -1,8 +1,7 @@
----
 - name: Setup basic control plane
   hosts: "{{prefix}}controlPlane"
   tasks:
-    - name: Install k3s server
-      shell: |
-        curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --node-ip {{ ansible_eth0.ipv4.address }} --node-external-ip {{ ansible_eth0.ipv4.address }} --flannel-backend=wireguard-native --disable=traefik" sh -
+  - name: Install k3s server
+    shell: |
+      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --node-ip {{ ansible_eth0.ipv4.address }} --node-external-ip {{ ansible_eth0.ipv4.address }} --flannel-backend=wireguard-native --disable=traefik" sh -
 
