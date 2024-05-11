@@ -39,7 +39,7 @@ lb:
 api:
   image:
     repository: ghcr.io/julsemaan/anyfile-notepad/api
-    tag: f8edb44d4db59fe407840eaea333a7b725f5ea27
+    tag: 4fc47df1918b0cab1c0317cf12a10c4e16598a10
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   podAnnotations: {}
