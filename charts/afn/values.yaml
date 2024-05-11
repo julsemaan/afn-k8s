@@ -19,7 +19,7 @@ lb:
   admin:
     image:
       repository: ghcr.io/julsemaan/anyfile-notepad/admin
-      tag: 216cd7c0ce733666b1bf5e2e8e3eaacce458f782
+      tag: 4fc47df1918b0cab1c0317cf12a10c4e16598a10
       pullPolicy: IfNotPresent
     domain: admin.DOMAIN_NAME
   app:
