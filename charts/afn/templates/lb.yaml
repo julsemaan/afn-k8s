@@ -10,7 +10,7 @@ metadata:
     {{- include "afn.app-labels" $context | nindent 4 }}
     app.kubernetes.io/region: {{ .name }}
   annotations:
-    secret.reloader.stakater.com/reload: "lb-crt-secret,{{ .name }}-crt-secret"
+    secret.reloader.stakater.com/reload: "lb-crt-secret,{{ .name }}-crt-secret,app-crt-secret"
 spec:
   selector:
     matchLabels:
