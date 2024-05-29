@@ -96,6 +96,7 @@ jobs:
         release: 'external-dns'
         namespace: 'afn'
         chart: 'oci://registry-1.docker.io/bitnamicharts/external-dns'
+        chart-version: 0.14.1
         value-files: >-
           [
             "${{vars.EXTERNAL_DNS_VALUES_PATH}}"
