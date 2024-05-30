@@ -1,0 +1,8 @@
+/mnt/logs/syslog
+{
+    daily
+    rotate 90
+    compress
+    missingok
+    copytruncate
+}
