@@ -1,0 +1,14 @@
+- name: Basic setup
+  hosts: "{{prefix}}afn-capl
+  tasks:
+    - name: Setup cron to watch for monit running
+      copy: 
+        dest: /etc/cron.d/watchdog-monit
+        content: |
+          MAILTO="admin@semaan.ca"
+          */5 * * * * root if ! /bin/systemctl status monit > /dev/null 2>&1 ; then echo "Monit is not running" ; fi
+    - name: copy the logrotate
+      copy:
+        src: conf/rotate-afn-syslog
+        dest: /etc/logrotate.d/afn-syslog
+
