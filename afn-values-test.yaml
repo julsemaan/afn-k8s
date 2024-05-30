@@ -11,10 +11,10 @@ controlRegion:
 regions:
   - name: north-america
     nodeSelector:
-      kubernetes.io/hostname: afn-v3-test-srv-mia-1
+      topology.kubernetes.io/region: us-mia
   - name: europe
     nodeSelector:
-      kubernetes.io/hostname: afn-v3-test-srv-mil-1
+      topology.kubernetes.io/region: it-mil
 
 dnsRegions:
   - name: north-america
