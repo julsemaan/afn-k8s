@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Set PATH
-      run: echo "export PATH=\$PATH:/tmp/bin" >> $GITHUB_ENV
+      run: echo "/tmp/bin" >> $GITHUB_PATH
 
     - name: Setup KUBECONFIG_B64
       run: |
