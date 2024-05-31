@@ -12,6 +12,8 @@ jobs:
   deployment:
     environment: ${{ github.event.inputs.environment || 'main' }}
     runs-on: 'ubuntu-latest'
+    env:
+      PATH: "/tmp/bin:${{ env.PATH }}"
     steps:
     - uses: actions/checkout@v4
 
