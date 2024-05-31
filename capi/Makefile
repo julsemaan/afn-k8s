@@ -13,6 +13,10 @@ kind-create:
 kind-clean:
 	kind delete cluster --name $(KIND_CLUSTER_NAME)
 
+clusterctl-install:
+	curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.7.2/clusterctl-linux-amd64 -o clusterctl
+	install -o root -g root -m 0755 clusterctl /usr/local/bin/clusterctl
+
 clusterctl-init: check-env kind-create
 	mkdir -p ~/.cluster-api
 	cp clusterctl.yaml ~/.cluster-api/
