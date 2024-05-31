@@ -1,5 +1,5 @@
 - name: Basic setup
-  hosts: "{{prefix}}afn-capl"
+  hosts: "controlPlane:workerNode"
   tasks:
   - name: copy the logrotate
     copy:
