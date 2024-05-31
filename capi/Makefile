@@ -27,9 +27,11 @@ clusterctl-save:
 	rm -fr $(SAVE_DIR)
 	mkdir -p $(SAVE_DIR)/
 	clusterctl move --to-directory $(SAVE_DIR)
+	kubectl get secret --field-selector=type=helm.sh/release.v1 -o yaml > $(SAVE_DIR)/helm.yaml
 
 clusterctl-restore:
 	clusterctl move --from-directory $(SAVE_DIR)
+	[ -f $(SAVE_DIR)/helm.yaml ] && kubectl apply -f - < $(SAVE_DIR)/helm.yaml || echo "helm.yaml doesn't exist"
 
 clusterctl-wait:
 	while [ `kubectl get clusters -o yaml | yq '.items[] | select(.status.phase!="Provisioned")' | wc -l` -ne 0 ]; do \

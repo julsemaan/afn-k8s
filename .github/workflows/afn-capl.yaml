@@ -28,7 +28,7 @@ jobs:
       with:
         name: clusterctl-save-${{ github.event.inputs.environment }}
 
-    - run: mv clusterctl-save-${{ github.event.inputs.environment }} capi/.clusterctl-save
+    - run: mv clusterctl-save-${{ github.event.inputs.environment }} capi/.clusterctl-save || mkdir -p capi/.clusterctl-save
     
     - run: make -C capi clusterctl-init
     - run: make -C capi clusterctl-restore
