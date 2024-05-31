@@ -26,7 +26,7 @@ jobs:
     
     - run: make -C capi gha-clusterctl-install
 
-    - run: make kind-create
+    - run: make -C capi kind-create
 
     - name: Setup KUBECONFIG_B64
       run: |
