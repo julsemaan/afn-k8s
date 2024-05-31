@@ -16,7 +16,7 @@ kind-clean:
 gha-clusterctl-install:
 	curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.7.2/clusterctl-linux-amd64 -o clusterctl
 	mkdir -p /tmp/bin
-	install -o root -g root -m 0755 clusterctl /tmp/bin/clusterctl
+	install -m 0755 clusterctl /tmp/bin/clusterctl
 
 clusterctl-init: check-env kind-create
 	mkdir -p ~/.cluster-api
