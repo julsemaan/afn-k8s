@@ -18,18 +18,7 @@ jobs:
     - name: Set PATH
       run: echo "/tmp/bin" >> $GITHUB_PATH
 
-    - name: Setup KUBECONFIG_B64
-      run: |
-        printf "$KUBECONFIG_DATA" > /tmp/KUBECONFIG_DATA
-        echo "KUBECONFIG_B64=$(cat /tmp/KUBECONFIG_DATA | base64 -w 0)" >> $GITHUB_ENV
-      env:
-        KUBECONFIG_DATA: ${{secrets.KUBECONFIG}}
-
-    - uses: frenck/action-setup-yq@v1
-
     - uses: tale/kubectl-action@v1
-      with:
-        base64-kube-config: ${{ env.KUBECONFIG_B64 }}
 
     - name: Download artifacts
       uses: actions/download-artifact@v4
@@ -54,8 +43,6 @@ jobs:
           [
             "${{vars.AFN_CAPL_VALUES_PATH}}"
           ]
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
     
     - run: make -C capi clusterctl-wait
     - run: make -C capi clusterctl-save
