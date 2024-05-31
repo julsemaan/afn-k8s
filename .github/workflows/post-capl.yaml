@@ -15,13 +15,42 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install linode_api4
-      run: pipx inject ansible-core linode_api4
-    
     - name: Setup secret/sasl_passwd.db
       run: |
         mkdir -p secret/
         echo ${{secrets.SASL_PASSWD}} | base64 -d > secret/sasl_passwd.db
+
+    - name: Setup KUBECONFIG_B64
+      run: |
+        printf "$KUBECONFIG_DATA" > /tmp/KUBECONFIG_DATA
+        echo "KUBECONFIG_B64=$(cat /tmp/KUBECONFIG_DATA | base64 -w 0)" >> $GITHUB_ENV
+      env:
+        KUBECONFIG_DATA: ${{secrets.KUBECONFIG}}
+
+    - uses: tale/kubectl-action@v1
+      with:
+        base64-kube-config: ${{ env.KUBECONFIG_B64 }}
+
+      run: |
+        echo "[controlPlane]" >> inventory
+        kubectl get node -lnode-role.kubernetes.io/control-plane=true -ojson \
+          | jq -r '.items[] | [.metadata.name, .metadata.annotations."flannel.alpha.coreos.com/public-ip"] | join("\t")' \
+          | while IFS= read -r line
+            do
+               ## take some action on $line
+              data=(${line//;/ })
+              echo ${data[0]} ansible_ssh_host=${data[1]} ansible_ssh_user=root >> inventory
+            done
+
+        echo "[workerNode]" >> inventory
+        kubectl get node -lnode-role.kubernetes.io/control-plane!=true -ojson \
+          | jq -r '.items[] | [.metadata.name, .metadata.annotations."flannel.alpha.coreos.com/public-ip"] | join("\t")' \
+          | while IFS= read -r line
+            do
+               ## take some action on $line
+              data=(${line//;/ })
+              echo ${data[0]} ansible_ssh_host=${data[1]} ansible_ssh_user=root >> inventory
+            done
 
     - name: Run playbook
       uses: dawidd6/action-ansible-playbook@v2
@@ -34,7 +63,7 @@ jobs:
         # Optional, additional flags to pass to ansible-playbook
         options: |
           -e prefix=${{vars.INFRA_PREFIX}}
-          --inventory infra/inventory_linode.yaml
+          --inventory inventory
           --verbose
       env:
         LINODE_ACCESS_TOKEN: ${{secrets.LINODE_ACCESS_TOKEN}}
