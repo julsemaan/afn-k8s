@@ -34,7 +34,7 @@ jobs:
 
     - run: mv clusterctl-save-${{ github.event.inputs.environment }} capi/.clusterctl-save || mkdir -p capi/.clusterctl-save
     
-    - run: make -C capi clusterctl-install
+    - run: make -C capi gha-clusterctl-install
     - run: make -C capi clusterctl-init
       env:
         LINODE_TOKEN: '${{ secrets.LINODE_ACCESS_TOKEN }}'
