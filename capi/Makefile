@@ -17,10 +17,19 @@ clusterctl-init: check-env kind-create
 	mkdir -p ~/.cluster-api
 	cp clusterctl.yaml ~/.cluster-api/
 	clusterctl init --bootstrap k3s --control-plane k3s --infrastructure linode-linode:$(CAPL_VERSION) --addon helm
+	while ! kubectl logs test-capl-webhook | grep 'capl-webhook-service.capl-system.svc.*open'; do\
+		kubectl delete pod test-capl-webhook ; kubectl run --image=busybox test-capl-webhook -- nc -zv capl-webhook-service.capl-system.svc 443 ;\
+		sleep 5 ;\
+	done
 
+SAVE_DIR ?= .clusterctl-save
 clusterctl-save:
-	mkdir -p .clusterctl-save/
-	clusterctl move --to-directory .clusterctl-save/
+	rm -fr $(SAVE_DIR)
+	mkdir -p $(SAVE_DIR)/
+	clusterctl move --to-directory $(SAVE_DIR)
+
+clusterctl-restore:
+	clusterctl move --from-directory $(SAVE_DIR)
 
 clusterctl-wait:
 	while [ `kubectl get clusters -o yaml | yq '.items[] | select(.status.phase!="Provisioned")' | wc -l` -ne 0 ]; do \
