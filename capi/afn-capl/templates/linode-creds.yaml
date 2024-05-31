@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/move: "true"
+    {{- include "afn-capl.labels" . | nindent 4 }}
+  name: {{ include "afn-capl.fullname" . }}-credentials
+stringData:
+  apiToken: {{ .Values.linodeApiToken }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/move: "true"
+    {{- include "afn-capl.labels" . | nindent 4 }}
+  name: {{ include "afn-capl.fullname" . }}-crs
+stringData:
+  linode-token-region.yaml: |-
+    kind: Secret
+    apiVersion: v1
+    metadata:
+      name: linode-token-region
+      namespace: kube-system
+    stringData:
+      apiToken: {{ .Values.linodeApiToken }}
+      region: {{ .Values.ctrlPlane.region }}

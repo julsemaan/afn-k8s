@@ -1,0 +1,151 @@
+{{ $context := . }}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  labels:
+    cluster: {{ include "afn-capl.fullname" . }}
+    {{- include "afn-capl.labels" . | nindent 4 }}
+  name: {{ include "afn-capl.fullname" . }}
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 10.192.0.0/10
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: KThreesControlPlane
+    name: {{ include "afn-capl.fullname" . }}-control-plane
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+    kind: LinodeCluster
+    name: {{ include "afn-capl.fullname" . }}
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: KThreesControlPlane
+metadata:
+  name: {{ include "afn-capl.fullname" . }}-control-plane
+  namespace: default
+spec:
+  infrastructureTemplate:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+    kind: LinodeMachineTemplate
+    name: {{ include "afn-capl.fullname" . }}-control-plane
+  kthreesConfigSpec:
+    agentConfig:
+      nodeName: '{{ "{{ ds.meta_data.label }}" }}'
+    files:
+    - content: |
+        flannel-backend: wireguard-native
+      owner: root:root
+      path: /etc/rancher/k3s/config.yaml.d/capi-config.yaml
+    - content: |-
+        apiVersion: helm.cattle.io/v1
+        kind: HelmChart
+        metadata:
+          namespace: kube-system
+          name: ccm-linode
+        spec:
+          targetNamespace: kube-system
+          version: v0.4.4
+          chart: ccm-linode
+          repo: https://linode.github.io/linode-cloud-controller-manager/
+          bootstrap: true
+          valuesContent: |-
+            secretRef:
+              name: "linode-token-region"
+            nodeSelector:
+              node-role.kubernetes.io/control-plane: "true"
+      owner: root:root
+      path: /var/lib/rancher/k3s/server/manifests/ccm-linode.yaml
+    - contentFrom:
+        secret:
+          key: linode-token-region.yaml
+          name: {{ include "afn-capl.fullname" . }}-crs
+      owner: root:root
+      path: /var/lib/rancher/k3s/server/manifests/linode-token-region.yaml
+    preK3sCommands:
+    - |
+      mkdir -p /etc/rancher/k3s/config.yaml.d/
+      echo "node-ip: $(ip a s eth0 |grep 'inet ' |cut -d' ' -f6|cut -d/ -f1 | grep ^192),$(ip a s eth0 |grep 'inet ' |cut -d' ' -f6|cut -d/ -f1|grep -v ^192)" >> /etc/rancher/k3s/config.yaml.d/capi-config.yaml
+      echo "node-external-ip: $(ip a s eth0 |grep 'inet ' |cut -d' ' -f6|cut -d/ -f1|grep -v ^192)" >> /etc/rancher/k3s/config.yaml.d/capi-config.yaml
+    - sed -i '/swap/d' /etc/fstab
+    - swapoff -a
+    - hostnamectl set-hostname '{{ "{{ ds.meta_data.label }}" }}' && hostname -F /etc/hostname
+    serverConfig:
+      disableComponents:
+      - servicelb
+      - traefik
+  replicas: 1
+  version: v1.29.1+k3s2
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: LinodeCluster
+metadata:
+  name: {{ include "afn-capl.fullname" . }}
+spec:
+  credentialsRef:
+    name: {{ include "afn-capl.fullname" . }}-credentials
+  region: {{ .Values.ctrlPlane.region }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: LinodeMachineTemplate
+metadata:
+  name: {{ include "afn-capl.fullname" . }}-control-plane
+spec:
+  template:
+    spec:
+      authorizedKeys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDOq3JQiyr8AHlOuLxAOq1nk7cSHZiRS/JvuhT9BxEcpw2U7eRKum3pU1MwrBaK5R9v1cfqNLFuqm0NkILv0xd7k6ccmdzcohTSXui6J1RAD6XKOj3NDvg2nSGDSkxX+EWUMsj6aGbhFrfIHcNvUIN4sph+wudUL0vqZAMCpxny7gyGi/F1/8NUfqV3kdX9mIgW6HQcx5TcwR0PJIWZTxTgRnAQkeQiSw59u+juyAED1l4/OGPEk37qWL3AkLjE6JhnuaCv4wXCxz7RNHoJByO0q+51aKX9heEAyCnoowKZ2FZ/bnLcEvyouKULDecd/7zDERTW740WPHnLbfoTWA+P julien@julien-mint"
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDrKKpWECptuwih7hcb53+U2VaxVUQoGXTebxAt/txkN7HyVhADjcVH8g2srSvfOWd5ESuTL5xKhgK0yUSKWrCfREXX0TIo7ueS6CVYGE6vGHUGnhEfFHmhARyERac1BMjpdttgUlN2qNAd1/a6VyJGsBH94cDarwVIordyQpp5uR+nEeTC+zMrbS86d4kqYsIA2JmO19ewUmI58AhIwLsneST980l+QQ2mxfZywKWp/xCYIjwp3MPgzc6rgrVGv9Wot6pqpDuPUauRyoex/7H3b26Mp7+3/6kUSnLnR4K90b18VFa9YWKunfqAmfNHoHSf8c6P346zr/vRHJTz0wiV root@afn-mgmt-nyc-1"
+      image: linode/ubuntu22.04
+      #privateIP: false
+      interfaces:
+      - primary: true
+        purpose: public
+      region: {{ .Values.ctrlPlane.region }}
+      type: {{ .Values.ctrlPlane.type }}
+
+{{- range .Values.pools }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: LinodeMachineTemplate
+metadata:
+  name: {{ include "afn-capl.fullname" $context }}-{{ .name }}
+spec:
+  template:
+    spec:
+      authorizedKeys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDOq3JQiyr8AHlOuLxAOq1nk7cSHZiRS/JvuhT9BxEcpw2U7eRKum3pU1MwrBaK5R9v1cfqNLFuqm0NkILv0xd7k6ccmdzcohTSXui6J1RAD6XKOj3NDvg2nSGDSkxX+EWUMsj6aGbhFrfIHcNvUIN4sph+wudUL0vqZAMCpxny7gyGi/F1/8NUfqV3kdX9mIgW6HQcx5TcwR0PJIWZTxTgRnAQkeQiSw59u+juyAED1l4/OGPEk37qWL3AkLjE6JhnuaCv4wXCxz7RNHoJByO0q+51aKX9heEAyCnoowKZ2FZ/bnLcEvyouKULDecd/7zDERTW740WPHnLbfoTWA+P julien@julien-mint"
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDrKKpWECptuwih7hcb53+U2VaxVUQoGXTebxAt/txkN7HyVhADjcVH8g2srSvfOWd5ESuTL5xKhgK0yUSKWrCfREXX0TIo7ueS6CVYGE6vGHUGnhEfFHmhARyERac1BMjpdttgUlN2qNAd1/a6VyJGsBH94cDarwVIordyQpp5uR+nEeTC+zMrbS86d4kqYsIA2JmO19ewUmI58AhIwLsneST980l+QQ2mxfZywKWp/xCYIjwp3MPgzc6rgrVGv9Wot6pqpDuPUauRyoex/7H3b26Mp7+3/6kUSnLnR4K90b18VFa9YWKunfqAmfNHoHSf8c6P346zr/vRHJTz0wiV root@afn-mgmt-nyc-1"
+      image: linode/ubuntu22.04
+      #privateIP: false
+      interfaces:
+      - primary: true
+        purpose: public
+      region: {{ .region }}
+      type: {{ .type }}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{ include "afn-capl.fullname" $context }}-{{ .name }}
+spec:
+  clusterName: {{ include "afn-capl.fullname" $context }}
+  replicas: {{ .size }}
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KThreesConfigTemplate
+          name: {{ include "afn-capl.fullname" $context }}
+      clusterName: {{ include "afn-capl.fullname" $context }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+        kind: LinodeMachineTemplate
+        name: {{ include "afn-capl.fullname" $context }}-{{ .name }}
+      version: v1.29.1+k3s2
+{{- end }}

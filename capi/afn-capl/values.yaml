@@ -1,0 +1,16 @@
+ctrlPlane:
+  region: us-ord
+  type: g6-standard-1
+
+pools:
+  - name: ord
+    type: g6-nanode-1
+    region: us-ord
+  - name: mil
+    type: g6-nanode-1
+    region: it-mil
+  - name: mia
+    type: g6-nanode-1
+    region: us-mia
+  
+linodeApiToken: null

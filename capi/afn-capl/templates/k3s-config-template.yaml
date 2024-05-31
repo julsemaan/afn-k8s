@@ -1,0 +1,21 @@
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KThreesConfigTemplate
+metadata:
+  name: {{ include "afn-capl.fullname" . }}
+  labels:
+    {{- include "afn-capl.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      agentConfig:
+        nodeName: '{{ "{{ ds.meta_data.label }}" }}'
+      preK3sCommands:
+      - |
+        mkdir -p /etc/rancher/k3s/config.yaml.d/
+        echo "node-ip: $(ip a s eth0 |grep 'inet ' |cut -d' ' -f6|cut -d/ -f1 | grep ^192),$(ip a s eth0 |grep 'inet ' |cut -d' ' -f6|cut -d/ -f1|grep -v ^192)" >> /etc/rancher/k3s/config.yaml.d/capi-config.yaml
+        echo "node-external-ip: $(ip a s eth0 |grep 'inet ' |cut -d' ' -f6|cut -d/ -f1 | grep -v ^192)" >> /etc/rancher/k3s/config.yaml.d/capi-config.yaml
+      - sed -i '/swap/d' /etc/fstab
+      - swapoff -a
+      - hostnamectl set-hostname '{{ "{{ ds.meta_data.label }}" }}' && hostname -F /etc/hostname
+
