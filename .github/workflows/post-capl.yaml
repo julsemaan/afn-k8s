@@ -31,6 +31,7 @@ jobs:
       with:
         base64-kube-config: ${{ env.KUBECONFIG_B64 }}
 
+    - name: Build inventory
       run: |
         echo "[controlPlane]" >> inventory
         kubectl get node -lnode-role.kubernetes.io/control-plane=true -ojson \
