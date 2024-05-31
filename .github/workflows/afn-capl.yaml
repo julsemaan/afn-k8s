@@ -56,7 +56,7 @@ jobs:
             "${{vars.AFN_CAPL_VALUES_PATH}}"
           ]
       env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+        KUBECONFIG_FILE: '/tmp/KUBECONFIG_DATA'
     
     - run: make -C capi clusterctl-wait
     - run: make -C capi clusterctl-save
