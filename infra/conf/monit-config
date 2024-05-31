@@ -3,7 +3,7 @@ set alert admin@semaan.ca
 
 set mail-format {
    from: monit@semaan.ca
-   subject: ANYFILE-NOTEPAD monit alert -- $EVENT $SERVICE
+   subject: $HOST monit alert -- $EVENT $SERVICE
    message: $EVENT Service $SERVICE
                  Date:        $DATE
                  Action:      $ACTION
