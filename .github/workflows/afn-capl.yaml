@@ -26,10 +26,6 @@ jobs:
       with:
         base64-kube-config: ${{ env.KUBECONFIG_B64 }}
 
-    - uses: 'vimeda/helm@v1.7.0'
-      env:
-        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
-
     - name: Download artifacts
       uses: actions/download-artifact@v4
       with:
@@ -39,7 +35,22 @@ jobs:
     
     - run: make -C capi clusterctl-init
     - run: make -C capi clusterctl-restore
-    - run: make -C capi helm-install-afn-capl
+
+    - name: 'Deploy afn-capl'
+      uses: 'vimeda/helm@v1.7.0'
+      with:
+        release: '${{ github.event.inputs.environment }}'
+        namespace: 'default'
+        chart: 'capi/afn-capl'
+        values: |
+          linodeApiToken: ${{ secrets.LINODE_ACCESS_TOKEN }}
+        value-files: >-
+          [
+            "${{vars.AFN_CAPL_VALUES_PATH}}"
+          ]
+      env:
+        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+    
     - run: make -C capi clusterctl-wait
     - run: make -C capi clusterctl-save
 
