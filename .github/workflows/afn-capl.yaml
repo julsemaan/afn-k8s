@@ -15,6 +15,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Setup KUBECONFIG_B64
+      run: |
+        printf "$KUBECONFIG_DATA" > /tmp/KUBECONFIG_DATA
+        echo "KUBECONFIG_B64=$(cat /tmp/KUBECONFIG_DATA | base64 -w 0)" >> $GITHUB_ENV
+      env:
+        KUBECONFIG_DATA: ${{secrets.KUBECONFIG}}
+
     - uses: tale/kubectl-action@v1
       with:
         base64-kube-config: ${{ env.KUBECONFIG_B64 }}
