@@ -13,3 +13,62 @@
         MAILTO="admin@semaan.ca"
         */5 * * * * root if ! /bin/systemctl status monit > /dev/null 2>&1 ; then echo "Monit is not running" ; fi
 
+- name: Monit configuration
+  hosts: "controlPlane:workerNode"
+  tasks:
+    - name: apt update
+      command: apt update
+
+    - name: install the latest version of monit
+      package:
+        name: monit
+        state: latest
+    - name: copy the monit crontab check
+      copy:
+        src: conf/check-monit-cron
+        dest: /etc/cron.d/
+
+- name: Monit ctrl-plane configuration
+  hosts: "controlPlane"
+  tasks:
+    - name: copy the monit ctrl-plane specific configuration
+      copy:
+        src: conf/monit-config-afn-logs
+        dest: /etc/monit/conf.d/anyfile-notepad-logs.conf
+
+- name: Monit common configuration
+  hosts: "controlPlane:workerNode"
+  tasks:
+    - name: copy the monit configuration
+      copy:
+        src: conf/monit-config
+        dest: /etc/monit/conf.d/anyfile-notepad.conf
+    - name: enable monit
+      command: systemctl enable monit
+    - name: restart monit
+      service:
+        name: monit
+        state: restarted
+
+- name: Postfix configuration
+  hosts: "controlPlane:workerNode"
+  tasks:
+    - name: install the latest version of postfix
+      package:
+        name: postfix
+        state: latest
+    - name: install postfix configuration
+      copy:
+        src: conf/postfix-main.cf
+        dest: /etc/postfix/main.cf
+    - name: install postfix sasl passwd DB
+      copy:
+        src: ../secret/sasl_passwd.db
+        dest: /etc/postfix/sasl_passwd.db
+    - name: enable postfix
+      command: systemctl enable postfix
+    - name: restart postfix
+      service:
+        name: postfix
+        state: restarted
+
