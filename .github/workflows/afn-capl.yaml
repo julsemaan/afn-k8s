@@ -12,10 +12,11 @@ jobs:
   deployment:
     environment: ${{ github.event.inputs.environment || 'main' }}
     runs-on: 'ubuntu-latest'
-    env:
-      PATH: "/tmp/bin:${{ env.PATH }}"
     steps:
     - uses: actions/checkout@v4
+
+    - name: Set PATH
+      run: echo "export PATH=\$PATH:/tmp/bin" >> $GITHUB_ENV
 
     - name: Setup KUBECONFIG_B64
       run: |
