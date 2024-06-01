@@ -43,20 +43,11 @@ jobs:
 
     - run: make -C capi clusterctl-restore
 
-    - name: 'Deploy afn-capl'
-      uses: 'vimeda/helm@v1.7.0'
-      with:
-        release: '${{ github.event.inputs.environment }}'
-        namespace: 'default'
-        chart: 'capi/afn-capl'
-        values: |
-          linodeApiToken: ${{ secrets.LINODE_ACCESS_TOKEN }}
-        value-files: >-
-          [
-            "${{vars.AFN_CAPL_VALUES_PATH}}"
-          ]
+    - run: make -C capi helm-install-afn-capl
       env:
-        KUBECONFIG_FILE: '/tmp/KUBECONFIG_DATA'
+        LINODE_TOKEN: ${{ secrets.LINODE_ACCESS_TOKEN }}
+        AFN_CAPL_VALUES_FILE: ${{vars.AFN_CAPL_VALUES_PATH}}
+        KUBECONFIG: /tmp/KUBECONFIG_DATA
     
     - run: make -C capi clusterctl-wait
     - run: make -C capi clusterctl-save
