@@ -18,8 +18,8 @@ jobs:
     - name: Set PATH
       run: echo "/tmp/bin" >> $GITHUB_PATH
 
-    - name: Install s3cmd
-      run: apt update && apt install s3cmd -y
+    - name: Set up S3cmd cli tool
+      uses: s3-actions/s3cmd@v1.6.1
 
     - run: make -C capi clusterctl-download
       env:
