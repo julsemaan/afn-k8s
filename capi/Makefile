@@ -43,7 +43,7 @@ CLUSTERCTL_SAVE_BUCKET ?= changeme
 OBJ_ACCESS_KEY ?= changeme
 OBJ_SECRET_KEY ?= changeme
 clusterctl-upload:
-	s3cmd sync --config .s3cfg --access_key=$(OBJ_ACCESS_KEY) --secret_key=$OBJ_SECRET_KEY() --delete-removed --force .clusterctl-save/ s3://$(CLUSTERCTL_SAVE_BUCKET)/.clusterctl-save/
+	s3cmd sync --config .s3cfg --access_key=$(OBJ_ACCESS_KEY) --secret_key=$(OBJ_SECRET_KEY) --delete-removed --force .clusterctl-save/ s3://$(CLUSTERCTL_SAVE_BUCKET)/.clusterctl-save/
 
 clusterctl-download:
 	s3cmd sync --config .s3cfg --access_key=$(OBJ_ACCESS_KEY) --secret_key=$(OBJ_SECRET_KEY) --delete-removed --force s3://$(CLUSTERCTL_SAVE_BUCKET)/.clusterctl-save/ .clusterctl-save/
