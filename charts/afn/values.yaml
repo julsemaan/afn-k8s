@@ -13,7 +13,7 @@ lb:
   pages:
     image:
       repository: ghcr.io/julsemaan/anyfile-notepad/pages
-      tag: 4fc47df1918b0cab1c0317cf12a10c4e16598a10
+      tag: 9f26cf6259583368007afc29368d181cc31d7468
       pullPolicy: IfNotPresent
     domain: pages.DOMAIN_NAME
   admin:
