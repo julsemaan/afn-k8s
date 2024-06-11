@@ -18,9 +18,8 @@ jobs:
     - name: Set PATH
       run: echo "/tmp/bin" >> $GITHUB_PATH
 
-
-    - name: Download artifacts
-      uses: actions/download-artifact@v4
+    - name: Install s3cmd
+      run: apt update && apt install s3cmd -y
 
     - run: make -C capi clusterctl-download
       env:
