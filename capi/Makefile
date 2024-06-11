@@ -38,6 +38,15 @@ clusterctl-restore:
 	clusterctl move --from-directory $(SAVE_DIR)
 	[ -f $(SAVE_DIR)/helm.yaml ] && kubectl apply -f - < $(SAVE_DIR)/helm.yaml || echo "$(SAVE_DIR)/helm.yaml doesn't exist"
 
+CLUSTERCTL_SAVE_BUCKET ?= changeme
+OBJ_ACCESS_KEY ?= changeme
+OBJ_SECRET_KEY ?= changeme
+clusterctl-upload:
+	s3cmd sync --config .s3cfg --access_key=$(OBJ_ACCESS_KEY) --secret_key=$OBJ_SECRET_KEY() --delete-removed --force .clusterctl-save/ s3://$(CLUSTERCTL_SAVE_BUCKET)/.clusterctl-save/
+
+clusterctl-download:
+	s3cmd sync --config .s3cfg --access_key=$(OBJ_ACCESS_KEY) --secret_key=$(OBJ_SECRET_KEY) --delete-removed --force s3://$(CLUSTERCTL_SAVE_BUCKET)/.clusterctl-save/ .clusterctl-save/
+
 clusterctl-wait:
 	while [ `kubectl get clusters -o yaml | yq '.items[] | select(.status.phase!="Provisioned")' | wc -l` -ne 0 ]; do \
 		echo "Waiting on clusters" ;\

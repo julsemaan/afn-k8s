@@ -22,8 +22,12 @@ jobs:
     - name: Download artifacts
       uses: actions/download-artifact@v4
 
-    - run: mv clusterctl-save-${{ github.event.inputs.environment }} capi/.clusterctl-save || mkdir -p capi/.clusterctl-save
-    
+    - run: make -C capi clusterctl-download
+      env:
+        CLUSTERCTL_SAVE_BUCKET: ${{ vars.CLUSTERCTL_SAVE_BUCKET }}
+        OBJ_ACCESS_KEY: ${{ secrets.OBJ_ACCESS_KEY }}
+        OBJ_SECRET_KEY: ${{ secrets.OBJ_SECRET_KEY }}
+
     - run: make -C capi gha-clusterctl-install
 
     - run: make -C capi kind-create
@@ -52,9 +56,9 @@ jobs:
     - run: make -C capi clusterctl-wait
     - run: make -C capi clusterctl-save
 
-    - name: Archive artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: clusterctl-save-${{ github.event.inputs.environment }}
-        path: |
-          capi/.clusterctl-save
+    - run: make -C capi clusterctl-upload
+      env:
+        CLUSTERCTL_SAVE_BUCKET: ${{ vars.CLUSTERCTL_SAVE_BUCKET }}
+        OBJ_ACCESS_KEY: ${{ secrets.OBJ_ACCESS_KEY }}
+        OBJ_SECRET_KEY: ${{ secrets.OBJ_SECRET_KEY }}
+
