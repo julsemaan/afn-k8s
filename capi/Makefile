@@ -35,6 +35,7 @@ clusterctl-save:
 	kubectl get secret --field-selector=type=helm.sh/release.v1 -o yaml > $(SAVE_DIR)/helm.yaml
 
 clusterctl-restore:
+	mkdir -p $(SAVE_DIR)
 	clusterctl move --from-directory $(SAVE_DIR)
 	[ -f $(SAVE_DIR)/helm.yaml ] && kubectl apply -f - < $(SAVE_DIR)/helm.yaml || echo "$(SAVE_DIR)/helm.yaml doesn't exist"
 
