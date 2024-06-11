@@ -70,3 +70,6 @@ helm-install-afn-capl: check-env
 
 helm-uninstall-afn-capl:
 	helm uninstall $(AFN_CAPL_RELEASE) 
+
+get-kubeconfig:
+	clusterctl get kubeconfig $(AFN_CAPL_RELEASE)-afn-capl

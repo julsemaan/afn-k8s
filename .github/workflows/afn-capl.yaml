@@ -61,3 +61,11 @@ jobs:
         OBJ_ACCESS_KEY: ${{ secrets.OBJ_ACCESS_KEY }}
         OBJ_SECRET_KEY: ${{ secrets.OBJ_SECRET_KEY }}
 
+    - run: make -C capi get-kubeconfig > /tmp/afn-capl-kubeconfig.yaml
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: kubeconfig.yaml
+        path: /tmp/afn-capl-kubeconfig.yaml
+        retention-days: 90
+
