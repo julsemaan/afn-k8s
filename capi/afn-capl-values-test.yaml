@@ -8,4 +8,6 @@ pools:
   - name: mia
     type: g6-nanode-1
     region: us-mia
-  
+  - name: den
+    type: g6-nanode-1
+    region: us-den-edge-1
