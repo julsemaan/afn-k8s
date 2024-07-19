@@ -5,9 +5,6 @@ pools:
   - name: mil
     type: g6-nanode-1
     region: it-mil
-  - name: mia
-    type: g6-nanode-1
-    region: us-mia
-  - name: den
-    type: g6-nanode-1
+  - name: den2
+    type: g6-dedicated-edge-2
     region: us-den-edge-1
