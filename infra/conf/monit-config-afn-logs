@@ -21,6 +21,7 @@ check file logs with path /mnt/logs/syslog
   ignore content = "31mERROR#033"
   ignore content = "http.log.access.log"
   ignore content = "external-dns"
+  ignore content = "caller=federate.go:251 .+ federation failed"
   if match "ERROR" then alert
   if match "error" then alert
   if match "Error" then alert
