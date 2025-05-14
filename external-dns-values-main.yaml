@@ -31,9 +31,4 @@ managedRecordTypesFilters:
   - CNAME
   - NS
 
-image:
-  repository: julsemaan/external-dns
-  tag: latest
-  pullPolicy: Always
-
 txtOwnerId: main
