@@ -9,9 +9,9 @@ controlRegion:
     value: afn-v3-control
 
 regions:
-  - name: north-america
-    nodeSelector:
-      kubernetes.io/hostname: afn-v3-srv-ord-2
+#  - name: north-america
+#    nodeSelector:
+#      kubernetes.io/hostname: afn-v3-srv-ord-2
   - name: south-america
     nodeSelector:
       kubernetes.io/hostname: afn-v3-srv-gru-1
